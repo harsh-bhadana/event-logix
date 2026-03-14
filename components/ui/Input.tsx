@@ -56,7 +56,7 @@ export function Select({ label, className, children, ...props }: SelectProps) {
 }
 
 interface CheckboxProps extends React.InputHTMLAttributes<HTMLInputElement> {
-  label: string;
+  label: React.ReactNode;
   description?: string;
 }
 

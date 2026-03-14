@@ -1,18 +1,21 @@
 import Link from "next/link";
+import Icon from "@/components/ui/Icon";
+import Button from "@/components/ui/Button";
+import { Input, Checkbox } from "@/components/ui/Input";
 
 export default function OnboardingPage() {
   return (
     <div className="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100 antialiased min-h-screen">
       {/* Main Container */}
-      <div className="relative flex min-h-screen w-full flex-col max-w-md mx-auto bg-background-light dark:bg-background-dark shadow-xl">
+      <div className="relative flex min-h-screen w-full flex-col max-w-md mx-auto bg-background-light dark:bg-background-dark shadow-xl border-x border-slate-200 dark:border-slate-800">
         {/* TopAppBar */}
         <header className="sticky top-0 z-10 bg-background-light dark:bg-background-dark border-b border-primary/10">
           <div className="flex items-center p-4 justify-between">
             <Link 
               href="/"
-              className="text-primary flex size-10 shrink-0 items-center justify-center rounded-full hover:bg-primary/10 cursor-pointer"
+              className="text-primary flex size-10 shrink-0 items-center justify-center rounded-full hover:bg-primary/10 cursor-pointer transition-colors"
             >
-              <span className="material-symbols-outlined">arrow_back</span>
+              <Icon name="arrow_back" />
             </Link>
             <h2 className="text-slate-900 dark:text-slate-100 text-lg font-bold leading-tight tracking-tight flex-1 text-center pr-10">Staff Onboarding</h2>
           </div>
@@ -37,41 +40,17 @@ export default function OnboardingPage() {
               <p className="text-slate-500 dark:text-slate-400 mt-1">Please provide your legal details to get started with event assignments.</p>
             </div>
             <div className="space-y-4">
-              {/* Name Input */}
               <div className="flex flex-col gap-2">
                 <label className="text-slate-900 dark:text-slate-100 text-sm font-semibold">Full Name</label>
-                <div className="relative">
-                  <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">person</span>
-                  <input 
-                    className="w-full pl-10 pr-4 h-12 rounded-lg border border-primary/20 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all" 
-                    placeholder="Enter your full name" 
-                    type="text"
-                  />
-                </div>
+                <Input icon="person" placeholder="Enter your full name" />
               </div>
-              {/* Email Input */}
               <div className="flex flex-col gap-2">
                 <label className="text-slate-900 dark:text-slate-100 text-sm font-semibold">Email Address</label>
-                <div className="relative">
-                  <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">mail</span>
-                  <input 
-                    className="w-full pl-10 pr-4 h-12 rounded-lg border border-primary/20 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all" 
-                    placeholder="email@example.com" 
-                    type="email"
-                  />
-                </div>
+                <Input type="email" icon="mail" placeholder="email@example.com" />
               </div>
-              {/* Phone Input */}
               <div className="flex flex-col gap-2">
                 <label className="text-slate-900 dark:text-slate-100 text-sm font-semibold">Phone Number</label>
-                <div className="relative">
-                  <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">phone</span>
-                  <input 
-                    className="w-full pl-10 pr-4 h-12 rounded-lg border border-primary/20 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all" 
-                    placeholder="+1 (555) 000-0000" 
-                    type="tel"
-                  />
-                </div>
+                <Input type="tel" icon="phone" placeholder="+1 (555) 000-0000" />
               </div>
             </div>
 
@@ -79,49 +58,50 @@ export default function OnboardingPage() {
             <div className="pt-4">
               <label className="text-slate-900 dark:text-slate-100 text-sm font-semibold mb-3 block">Quick Select Role Preference</label>
               <div className="grid grid-cols-3 gap-3">
-                <button className="flex flex-col items-center justify-center p-3 rounded-xl border-2 border-primary bg-primary/5 text-primary transition-all">
-                  <span className="material-symbols-outlined mb-1">security</span>
-                  <span className="text-[10px] font-bold uppercase">Security</span>
-                </button>
-                <button className="flex flex-col items-center justify-center p-3 rounded-xl border-2 border-primary/10 bg-white dark:bg-slate-800 hover:border-primary/40 transition-all">
-                  <span className="material-symbols-outlined mb-1 text-slate-400">medical_services</span>
-                  <span className="text-[10px] font-bold uppercase text-slate-500">Medical</span>
-                </button>
-                <button className="flex flex-col items-center justify-center p-3 rounded-xl border-2 border-primary/10 bg-white dark:bg-slate-800 hover:border-primary/40 transition-all">
-                  <span className="material-symbols-outlined mb-1 text-slate-400">inventory_2</span>
-                  <span className="text-[10px] font-bold uppercase text-slate-500">Logistics</span>
-                </button>
+                {[
+                  { icon: "security", label: "Security", active: true },
+                  { icon: "medical_services", label: "Medical", active: false },
+                  { icon: "inventory_2", label: "Logistics", active: false },
+                ].map((role, i) => (
+                  <button 
+                    key={i} 
+                    className={`flex flex-col items-center justify-center p-3 rounded-xl border-2 transition-all ${
+                      role.active 
+                        ? 'border-primary bg-primary/5 text-primary shadow-sm' 
+                        : 'border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-800 hover:border-primary/40 text-slate-500'
+                    }`}
+                  >
+                    <Icon name={role.icon} className={`mb-1 ${!role.active ? 'text-slate-400' : ''}`} />
+                    <span className="text-[10px] font-bold uppercase">{role.label}</span>
+                  </button>
+                ))}
               </div>
             </div>
 
             {/* Step 3: Document Upload Section (Preview) */}
-            <div className="rounded-xl border-2 border-dashed border-primary/20 p-6 flex flex-col items-center justify-center bg-primary/5">
-              <span className="material-symbols-outlined text-4xl text-primary mb-2">cloud_upload</span>
+            <div className="rounded-xl border-2 border-dashed border-primary/20 p-6 flex flex-col items-center justify-center bg-primary/5 group cursor-pointer hover:border-primary/40 transition-colors">
+              <div className="size-12 rounded-full bg-primary/10 flex items-center justify-center mb-2 group-hover:scale-110 transition-transform">
+                <Icon name="cloud_upload" className="text-2xl text-primary" />
+              </div>
               <p className="text-sm font-semibold text-slate-900 dark:text-slate-100">Upload Government ID</p>
               <p className="text-xs text-slate-500 text-center mt-1">PDF, JPG or PNG (Max 5MB)</p>
-              <button className="mt-4 px-4 py-2 bg-white dark:bg-slate-700 text-primary text-xs font-bold rounded-lg shadow-sm border border-primary/10">Browse Files</button>
+              <Button variant="outline" size="sm" className="mt-4 h-9 bg-white dark:bg-slate-700">Browse Files</Button>
             </div>
           </section>
         </main>
 
         {/* Footer Navigation */}
-        <footer className="p-6 bg-background-light dark:bg-background-dark border-t border-primary/10">
-          <div className="flex flex-col gap-4">
-            {/* Terms Link */}
-            <div className="flex items-center gap-2">
-              <input className="rounded border-primary/30 text-primary focus:ring-primary bg-white dark:bg-slate-800" id="terms" type="checkbox" />
-              <label className="text-xs text-slate-500 dark:text-slate-400" htmlFor="terms">
-                I agree to the <a className="text-primary font-semibold underline" href="#">Terms & Conditions</a> for event staffing.
-              </label>
-            </div>
-            <button className="w-full bg-primary hover:bg-primary/90 text-white font-bold h-14 rounded-xl shadow-lg shadow-primary/20 flex items-center justify-center gap-2 transition-all">
-              <span>Continue to Next Step</span>
-              <span className="material-symbols-outlined">arrow_forward</span>
-            </button>
-            <button className="w-full text-slate-500 font-semibold text-sm h-10 hover:text-primary transition-colors">
-              Save for Later
-            </button>
+        <footer className="p-6 bg-background-light dark:bg-background-dark border-t border-primary/10 space-y-4">
+          <div className="flex items-center gap-3">
+             <Checkbox id="terms" label={<span className="text-xs text-slate-500 dark:text-slate-400">I agree to the <a className="text-primary font-semibold underline" href="#">Terms & Conditions</a> for event staffing.</span>} />
           </div>
+          <Button className="w-full h-14 rounded-xl text-lg shadow-lg shadow-primary/20">
+            Continue to Next Step
+            <Icon name="arrow_forward" />
+          </Button>
+          <Button variant="ghost" className="w-full text-slate-500 hover:text-primary h-10">
+            Save for Later
+          </Button>
         </footer>
 
         {/* Step Indicator Dots */}
