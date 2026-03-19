@@ -1,0 +1,79 @@
+@import "tailwindcss";
+
+@theme {
+  --font-headline: "Manrope", sans-serif;
+  --font-body: "Inter", sans-serif;
+  --font-label: "Inter", sans-serif;
+
+  --color-on-tertiary-container: #4a5c40;
+  --color-inverse-on-surface: #9e9d9c;
+  --color-tertiary-fixed-dim: #cee3c0;
+  --color-on-primary-container: #195c4e;
+  --color-primary-fixed: #afefdd;
+  --color-secondary-dim: #505452;
+  --color-secondary: #5c605e;
+  --color-on-background: #303332;
+  --color-surface-variant: #e2e3e1;
+  --color-outline-variant: #b1b2b0;
+  --color-tertiary-fixed: #ddf2ce;
+  --color-on-primary: #defff4;
+  --color-on-tertiary-fixed-variant: #54664a;
+  --color-primary-fixed-dim: #a1e1cf;
+  --color-surface-bright: #fbf9f7;
+  --color-error-dim: #4e0309;
+  --color-tertiary-container: #ddf2ce;
+  --color-on-tertiary-fixed: #38492f;
+  --color-secondary-container: #e1e3e0;
+  --color-on-secondary-fixed: #3c403e;
+  --color-inverse-surface: #0e0e0e;
+  --color-tertiary: #526448;
+  --color-on-surface-variant: #5d5f5e;
+  --color-on-secondary: #f7f9f7;
+  --color-on-primary-fixed-variant: #266658;
+  --color-surface-container-low: #f5f3f2;
+  --color-surface-container-highest: #e2e3e1;
+  --color-outline: #797b79;
+  --color-secondary-fixed-dim: #d2d5d2;
+  --color-error: #9f403d;
+  --color-inverse-primary: #bdfeeb;
+  --color-on-secondary-fixed-variant: #595c5a;
+  --color-surface-tint: #29695b;
+  --color-on-primary-fixed: #00483c;
+  --color-primary-container: #afefdd;
+  --color-surface-dim: #d9dad8;
+  --color-on-tertiary: #ecffdd;
+  --color-surface-container-high: #e8e8e6;
+  --color-background: #fbf9f7;
+  --color-surface: #fbf9f7;
+  --color-secondary-fixed: #e1e3e0;
+  --color-tertiary-dim: #46583d;
+  --color-on-surface: #303332;
+  --color-primary: #29695b;
+  --color-surface-container-lowest: #ffffff;
+  --color-error-container: #fe8983;
+  --color-primary-dim: #1a5c4f;
+  --color-on-secondary-container: #4f5251;
+  --color-on-error: #fff7f6;
+  --color-surface-container: #eeeeec;
+  --color-on-error-container: #752121;
+
+  --radius-DEFAULT: 0.125rem;
+  --radius-lg: 0.25rem;
+  --radius-xl: 0.5rem;
+  --radius-full: 0.75rem;
+}
+
+:root {
+  --background: var(--color-background);
+  --foreground: var(--color-on-background);
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-body);
+}
+
+.material-symbols-outlined {
+  font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+}
