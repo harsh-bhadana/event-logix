@@ -28,7 +28,7 @@ export function Step1BasicInfo() {
               type="text"
               value={data.title}
               onChange={(e) => updateData({ title: e.target.value })}
-              className="w-full h-12 px-4 bg-surface-container-highest rounded-md border-none focus:ring-2 focus:ring-primary/20 focus:bg-surface-container-lowest transition-all font-body text-on-surface"
+              className={`w-full h-12 px-4 bg-surface-container-highest rounded-md border-none focus:ring-2 focus:ring-primary/20 focus:bg-surface-container-lowest transition-all font-body text-on-surface ${!data.title ? 'ring-1 ring-error/20' : ''}`}
               placeholder="e.g. Annual Strategic Summit 2024"
             />
           </div>
@@ -53,7 +53,7 @@ export function Step1BasicInfo() {
                 type="date"
                 value={data.date}
                 onChange={(e) => updateData({ date: e.target.value })}
-                className="w-full h-12 px-4 bg-surface-container-highest rounded-md border-none focus:ring-2 focus:ring-primary/20 focus:bg-surface-container-lowest transition-all font-body text-on-surface"
+                className={`w-full h-12 px-4 bg-surface-container-highest rounded-md border-none focus:ring-2 focus:ring-primary/20 focus:bg-surface-container-lowest transition-all font-body text-on-surface ${!data.date ? 'ring-1 ring-error/20' : ''}`}
               />
             </div>
           </div>

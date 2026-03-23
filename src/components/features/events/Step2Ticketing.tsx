@@ -63,7 +63,7 @@ export function Step2Ticketing() {
                     type="text"
                     value={data.ticketPrice}
                     onChange={(e) => updateData({ ticketPrice: e.target.value })}
-                    className="w-full pl-8 pr-4 py-4 bg-surface-container-highest border-0 rounded-lg focus:ring-2 focus:ring-primary transition-all text-on-surface font-semibold text-lg"
+                    className={`w-full pl-8 pr-4 py-4 bg-surface-container-highest border-0 rounded-lg focus:ring-2 focus:ring-primary transition-all text-on-surface font-semibold text-lg ${!data.ticketPrice && data.accessModel === 'paid' ? 'ring-1 ring-error/20' : ''}`}
                   />
                 </div>
               </div>
@@ -73,7 +73,7 @@ export function Step2Ticketing() {
                   type="number"
                   value={data.totalQuantity}
                   onChange={(e) => updateData({ totalQuantity: e.target.value })}
-                  className="w-full px-4 py-4 bg-surface-container-highest border-0 rounded-lg focus:ring-2 focus:ring-primary transition-all text-on-surface font-semibold text-lg"
+                  className={`w-full px-4 py-4 bg-surface-container-highest border-0 rounded-lg focus:ring-2 focus:ring-primary transition-all text-on-surface font-semibold text-lg ${!data.totalQuantity ? 'ring-1 ring-error/20' : ''}`}
                 />
               </div>
             </div>

@@ -14,7 +14,25 @@ export function WizardFooter() {
   const { data, currentStep, setCurrentStep } = useWizard();
   const [isPublishing, setIsPublishing] = useState(false);
 
+  const validateStep = (step: number) => {
+    switch (step) {
+      case 1:
+        return !!(data.title && data.date && data.description && data.category);
+      case 2:
+        return !!(data.totalQuantity && (data.accessModel === 'free' || data.ticketPrice));
+      case 3:
+        return data.staffRoles.length > 0;
+      default:
+        return true;
+    }
+  };
+
   const handleNext = async () => {
+    if (!validateStep(currentStep)) {
+      alert("Please fill in all required fields before proceeding.");
+      return;
+    }
+
     if (currentStep < 4) {
       setCurrentStep(currentStep + 1);
       window.scrollTo(0, 0);
@@ -23,10 +41,14 @@ export function WizardFooter() {
       try {
         const result = await publishEvent(data);
         if (result.success) {
-          alert(result.message);
+          alert("Success: " + result.message);
+          // Optionally redirect or reset
+        } else {
+          alert("Error: " + result.message);
         }
       } catch (error) {
         console.error("Failed to publish event:", error);
+        alert("An unexpected error occurred.");
       } finally {
         setIsPublishing(false);
       }
