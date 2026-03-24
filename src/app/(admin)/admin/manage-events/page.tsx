@@ -1,6 +1,7 @@
 import { getAdminEvents } from "@/lib/actions/event-actions";
 import { getAdminInsights } from "@/lib/actions/booking-actions";
 import { AdminEventsClient } from "@/components/admin/AdminEventsClient";
+import { TableRowSkeleton } from "@/components/ui/Loader";
 import { Suspense } from "react";
 
 interface ManageEventsPageProps {
@@ -35,7 +36,7 @@ export default async function ManageEventsPage({ searchParams }: ManageEventsPag
   const insights = insightsResult.success ? insightsResult.data : null;
 
   return (
-    <Suspense fallback={<div className="p-10 animate-pulse">Loading events...</div>}>
+    <Suspense fallback={<div className="px-10 py-10"><TableRowSkeleton rows={8} /></div>}>
       <AdminEventsClient initialData={initialData} insights={insights} />
     </Suspense>
   );
