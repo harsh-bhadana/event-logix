@@ -7,6 +7,7 @@ import User from "@/models/User";
 import { getSession } from "@/lib/auth";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
+import { createNotification } from "./notification-actions";
 
 // ── BOOKING ──────────────────────────────────────────────────────────────────
 
@@ -64,6 +65,16 @@ export async function bookTicket(input: BookTicketInput) {
     });
     await booking.save();
 
+    // Notify Attendee
+    await createNotification(session.user.id, {
+      title: ticket.price === 0 ? "Booking Confirmed!" : "Booking Created",
+      message: ticket.price === 0 
+        ? `Your ticket for ${event.title} is confirmed.` 
+        : `Your booking for ${event.title} is ready. Please complete payment.`,
+      type: ticket.price === 0 ? "success" : "info",
+      link: "/dashboard"
+    });
+
     revalidatePath(`/events/${input.eventId}`);
     revalidatePath("/admin/manage-events");
 
@@ -99,6 +110,14 @@ export async function completeBookingPayment(bookingId: string) {
     booking.qrCode = booking._id.toString();
 
     await booking.save();
+
+    // Notify Attendee
+    await createNotification(session.user.id, {
+      title: "Payment Successful!",
+      message: "Your payment has been received. Your ticket is now available in your dashboard.",
+      type: "success",
+      link: "/dashboard"
+    });
 
     revalidatePath("/dashboard");
     revalidatePath("/events/success");

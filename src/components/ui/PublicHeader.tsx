@@ -3,9 +3,11 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { logout } from "@/lib/actions/auth-actions";
+import { NotificationDropdown } from "./NotificationDropdown";
 
 interface PublicHeaderProps {
   user?: {
+    id: string;
     name: string;
     role: string;
   } | null;
@@ -56,6 +58,7 @@ export function PublicHeader({ user }: PublicHeaderProps) {
         <div className="hidden md:flex items-center gap-4">
           {user ? (
             <>
+              <NotificationDropdown userId={user.id} />
               <Link
                 href={dashboardLink}
                 className="px-4 py-2 text-primary font-bold hover:bg-primary/5 rounded-lg transition-all"

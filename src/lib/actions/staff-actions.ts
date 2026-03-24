@@ -3,6 +3,7 @@
 import dbConnect from "@/lib/mongodb";
 import User from "@/models/User";
 import { revalidatePath } from "next/cache";
+import { createNotification } from "./notification-actions";
 
 export async function getStaffApplications() {
   try {
@@ -42,6 +43,16 @@ export async function updateStaffStatus(userId: string, status: 'approved' | 're
     if (!user) {
       return { success: false, error: "User not found" };
     }
+
+    // Notify Staff
+    await createNotification(userId, {
+      title: status === 'approved' ? 'Application Approved!' : 'Application Update',
+      message: status === 'approved' 
+        ? 'Welcome to the team! You can now apply for open roles.' 
+        : `Your application status: ${status}. ${reason ? 'Reason: ' + reason : ''}`,
+      type: status === 'approved' ? 'success' : 'warning',
+      link: '/staff/jobs'
+    });
 
     revalidatePath('/admin/staff/applications');
     revalidatePath('/admin/staff/roster');
@@ -96,6 +107,15 @@ export async function submitOnboarding(formData: FormData) {
 
     if (!user) return { success: false, error: "User not found" };
 
+    // Notify Admin
+    const adminId = '69c29ad5886e033a0dbe4d1f'; 
+    await createNotification(adminId, {
+      title: 'New Staff Application',
+      message: `${user.name} has submitted their onboarding for review.`,
+      type: 'info',
+      link: '/admin/staff'
+    });
+
     revalidatePath('/admin/staff/applications');
     return { success: true, message: "Onboarding submitted successfully. Awaiting admin approval." };
   } catch (error: any) {
@@ -137,6 +157,14 @@ export async function requestPayout(userId: string, amount: number, details: any
     await user.save();
 
     revalidatePath('/staff/earnings');
+
+    // Notify Staff
+    await createNotification(userId, {
+      title: 'Payout Requested',
+      message: `Your request for $${amount} has been received and is being processed.`,
+      type: 'success',
+      link: '/staff/earnings'
+    });
     return { success: true, message: "Payout requested successfully" };
   } catch (error: any) {
     console.error("Error requesting payout:", error);
