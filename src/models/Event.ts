@@ -9,21 +9,36 @@ export interface IStaffRoleNeeded {
 export interface IEvent extends Document {
   title: string;
   description: string;
-  bannerImage: string | null;
+  imageUrl: string | null;
   category: string;
   date: Date;
+  locationName: string;
   location: {
     type: 'Point';
     address: string;
     coordinates: number[];
   };
   accessModel: "paid" | "free";
-  ticketPrice: number;
-  totalQuantity: number;
+  ticketTypes: Array<{
+    name: string;
+    price: number;
+    quantity: number;
+  }>;
   pricingStrategy: "early-bird" | "group-rate" | "standard";
   taxInclusive: boolean;
   showFeeBreakdown: boolean;
   staffRolesNeeded: IStaffRoleNeeded[];
+  speakers?: Array<{
+    name: string;
+    role: string;
+    company: string;
+    imageUrl: string;
+  }>;
+  attendeeTypes?: Array<{
+    name: string;
+    description: string;
+    icon: string;
+  }>;
   status: 'draft' | 'published' | 'cancelled';
   createdBy: mongoose.Types.ObjectId;
   createdAt: Date;
@@ -40,21 +55,36 @@ const EventSchema = new Schema<IEvent>(
   {
     title: { type: String, required: true },
     description: { type: String, required: true },
-    bannerImage: { type: String, default: null },
+    imageUrl: { type: String, default: null },
     category: { type: String, required: true },
     date: { type: Date, required: true },
+    locationName: { type: String },
     location: {
       type: { type: String, default: 'Point' },
       address: String,
       coordinates: [Number] // [longitude, latitude]
     },
     accessModel: { type: String, enum: ["paid", "free"], required: true },
-    ticketPrice: { type: Number, default: 0 },
-    totalQuantity: { type: Number, required: true },
+    ticketTypes: [{
+      name: String,
+      price: Number,
+      quantity: Number
+    }],
     pricingStrategy: { type: String, enum: ["early-bird", "group-rate", "standard"], required: true },
     taxInclusive: { type: Boolean, default: true },
     showFeeBreakdown: { type: Boolean, default: false },
     staffRolesNeeded: [StaffRoleNeededSchema],
+    speakers: [{
+      name: String,
+      role: String,
+      company: String,
+      imageUrl: String
+    }],
+    attendeeTypes: [{
+      name: String,
+      description: String,
+      icon: String
+    }],
     status: { 
       type: String, 
       enum: ['draft', 'published', 'cancelled'], 
@@ -67,7 +97,6 @@ const EventSchema = new Schema<IEvent>(
   }
 );
 
-// Add index for location if needed
 EventSchema.index({ location: '2dsphere' });
 
 export default mongoose.models.Event || mongoose.model<IEvent>("Event", EventSchema);
