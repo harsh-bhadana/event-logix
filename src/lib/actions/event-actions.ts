@@ -100,7 +100,11 @@ export async function getStaffOpportunities(filters?: { dateRange?: string; expe
     };
   } catch (error: any) {
     console.error("Error fetching staff opportunities:", error);
-    return { success: false, error: error.message || "Failed to fetch opportunities" };
+    return { 
+      success: false, 
+      error: error.message || "Failed to fetch opportunities",
+      data: [] 
+    };
   }
 }
 
@@ -165,6 +169,13 @@ export async function getAdminEvents(filters?: { search?: string; status?: strin
     };
   } catch (error: any) {
     console.error("Error fetching admin events:", error);
-    return { success: false, error: error.message || "Failed to fetch events" };
+    return { 
+      success: false, 
+      error: error.message || "Failed to fetch events",
+      data: [],
+      total: 0,
+      page: 1,
+      pages: 1
+    };
   }
 }

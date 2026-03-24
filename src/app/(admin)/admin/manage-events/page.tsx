@@ -19,7 +19,7 @@ export default async function ManageEventsPage({ searchParams }: ManageEventsPag
     page: params.page ? parseInt(params.page, 10) : 1
   };
 
-  const result = await getAdminEvents(filters);
+  const result = (await getAdminEvents(filters)) as any;
   
   const initialData = {
     events: result.success ? result.data : [],
