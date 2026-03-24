@@ -1,5 +1,15 @@
 @import "tailwindcss";
 
+@view-transition {
+  navigation: auto;
+}
+
+/* Optional: Customize transition animations */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 0.5s;
+}
+
 @theme {
   --font-headline: "Manrope", sans-serif;
   --font-body: "Inter", sans-serif;
