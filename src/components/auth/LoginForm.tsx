@@ -56,7 +56,7 @@ export default function LoginForm() {
       <div className="space-y-2">
         <div className="flex justify-between items-center ml-1">
           <label className="text-xs font-bold text-on-surface-variant uppercase tracking-widest">Password</label>
-          <Link href="/forgot-password" size="sm" className="text-[10px] font-bold text-primary hover:text-primary-dim uppercase tracking-wider transition-colors">
+          <Link href="/forgot-password" className="text-[10px] font-bold text-primary hover:text-primary-dim uppercase tracking-wider transition-colors">
             Forgot Password?
           </Link>
         </div>
