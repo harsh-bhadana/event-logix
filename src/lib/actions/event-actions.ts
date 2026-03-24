@@ -1,6 +1,7 @@
 "use server";
 import dbConnect from "@/lib/mongodb";
-import Event from "@/models/Event";
+import Event, { IEvent } from "@/models/Event";
+import Booking from "@/models/Booking";
 import { WizardData } from "@/hooks/useEventWizard";
 import { revalidatePath } from "next/cache";
 
@@ -100,5 +101,70 @@ export async function getStaffOpportunities(filters?: { dateRange?: string; expe
   } catch (error: any) {
     console.error("Error fetching staff opportunities:", error);
     return { success: false, error: error.message || "Failed to fetch opportunities" };
+  }
+}
+
+export async function getAdminEvents(filters?: { search?: string; status?: string; page?: number }) {
+  try {
+    await dbConnect();
+    
+    let query: any = {};
+    
+    if (filters?.status && filters.status !== 'All Events') {
+      const statusLower = filters.status.toLowerCase();
+      if (['draft', 'published', 'completed', 'cancelled'].includes(statusLower)) {
+        query.status = statusLower;
+      }
+    }
+    
+    if (filters?.search) {
+      query.$or = [
+        { title: { $regex: filters.search, $options: 'i' } },
+        { locationName: { $regex: filters.search, $options: 'i' } }
+      ];
+    }
+
+    const page = filters?.page || 1;
+    const limit = 10;
+    const skip = (page - 1) * limit;
+
+    const total = await Event.countDocuments(query);
+    const events = await Event.find(query)
+      .sort({ date: -1 })
+      .skip(skip)
+      .limit(limit)
+      .lean();
+
+    // Enhance events with booking data manually since we used lean()
+    const enhancedEvents = await Promise.all(events.map(async (event: any) => {
+      const bookingsCount = await Booking.countDocuments({ 
+        event: event._id,
+        paymentStatus: 'completed'
+      });
+      
+      const totalTickets = event.ticketTypes.reduce((acc: number, type: any) => acc + (type.quantity || 0), 0);
+      
+      const staffFilled = event.staffRolesNeeded.reduce((acc: number, role: any) => acc + (role.assignedStaff?.length || 0), 0);
+      const totalStaff = event.staffRolesNeeded.reduce((acc: number, role: any) => acc + (role.count || 0), 0);
+
+      return {
+        ...event,
+        bookingsCount,
+        totalTickets,
+        staffFilled,
+        totalStaff
+      };
+    }));
+
+    return {
+      success: true,
+      data: JSON.parse(JSON.stringify(enhancedEvents)),
+      total,
+      page,
+      pages: Math.ceil(total / limit)
+    };
+  } catch (error: any) {
+    console.error("Error fetching admin events:", error);
+    return { success: false, error: error.message || "Failed to fetch events" };
   }
 }
