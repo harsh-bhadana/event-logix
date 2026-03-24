@@ -8,6 +8,21 @@ export interface IUser extends Document {
   staffProfile?: {
     skills: string[];
     isVerified: boolean;
+    profileImage?: string;
+    bio?: string;
+    yearsOfExperience?: string;
+    noticePeriod?: string;
+    customTags?: string[];
+    availability?: {
+      monday: boolean;
+      tuesday: boolean;
+      wednesday: boolean;
+      thursday: boolean;
+      friday: boolean;
+      saturday: boolean;
+      sunday: boolean;
+    };
+    verificationDocs?: string[];
   };
   createdAt: Date;
   updatedAt: Date;
@@ -25,7 +40,22 @@ const UserSchema = new Schema<IUser>(
     },
     staffProfile: {
       skills: [String],
-      isVerified: { type: Boolean, default: false }
+      isVerified: { type: Boolean, default: false },
+      profileImage: String,
+      bio: String,
+      yearsOfExperience: String,
+      noticePeriod: String,
+      customTags: [String],
+      availability: {
+        monday: { type: Boolean, default: true },
+        tuesday: { type: Boolean, default: true },
+        wednesday: { type: Boolean, default: true },
+        thursday: { type: Boolean, default: true },
+        friday: { type: Boolean, default: true },
+        saturday: { type: Boolean, default: false },
+        sunday: { type: Boolean, default: false },
+      },
+      verificationDocs: [String]
     }
   },
   { timestamps: true }
