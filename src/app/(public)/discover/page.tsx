@@ -127,7 +127,7 @@ export default async function DiscoverPage() {
 
       {/* Event Grid */}
       <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-12 animate-in fade-in slide-in-from-bottom-4 duration-700">
-        {events.map((event) => (
+        {events.map((event: { id: string; title: string; price: number; date: string; location: string; imageUrl: string; tag?: string }) => (
           <EventCard key={event.id} {...event} />
         ))}
       </section>
