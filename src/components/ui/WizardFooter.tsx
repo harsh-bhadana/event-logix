@@ -66,7 +66,7 @@ export function WizardFooter() {
     <footer className="bg-background dark:bg-neutral-900 border-t border-outline-variant/10 fixed bottom-0 right-0 w-[calc(100%-16rem)] flex justify-between items-center px-12 py-6 ml-64 shadow-lg z-50">
       <div className="flex items-center gap-4">
         <span className="font-body font-semibold text-sm text-on-surface-variant dark:text-neutral-400">
-          © 2024 The Executive Ledger
+          © 2024 Event Logix
         </span>
       </div>
       <div className="flex items-center gap-4">

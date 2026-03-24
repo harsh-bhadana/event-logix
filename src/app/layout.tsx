@@ -15,8 +15,8 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "The Executive Ledger - Event Wizard",
-  description: "A premium event management platform for executives.",
+  title: "Event Logix",
+  description: "A premium event management platform.",
 };
 
 export default function RootLayout({
