@@ -49,3 +49,56 @@ export async function publishEvent(data: WizardData) {
     };
   }
 }
+
+export async function getStaffOpportunities(filters?: { dateRange?: string; expertise?: string }) {
+  try {
+    await dbConnect();
+    
+    let query: any = { status: 'published' };
+    
+    const now = new Date();
+    
+    if (filters?.dateRange === 'This Week') {
+      const endOfWeek = new Date();
+      endOfWeek.setDate(now.getDate() + 7);
+      query.date = { $gte: now, $lte: endOfWeek };
+    } else if (filters?.dateRange === 'Next Month') {
+       const startOfMonth = new Date();
+       startOfMonth.setMonth(now.getMonth() + 1);
+       startOfMonth.setDate(1);
+       const endOfMonth = new Date(startOfMonth);
+       endOfMonth.setMonth(endOfMonth.getMonth() + 1);
+       endOfMonth.setDate(0);
+       query.date = { $gte: startOfMonth, $lte: endOfMonth };
+    }
+
+    const events = await Event.find(query).sort({ date: 1 }).lean();
+    
+    // Filter events that have at least one open slot
+    const opportunities = events.filter((event: any) => {
+      const openRoles = event.staffRolesNeeded.filter((role: any) => 
+        role.assignedStaff.length < role.count
+      );
+      
+      if (openRoles.length === 0) return false;
+      
+      // Filter by expertise if provided
+      if (filters?.expertise && filters.expertise !== 'All Roles') {
+        const matchesExpertise = openRoles.some((role: any) => 
+          role.roleName.toLowerCase().includes(filters.expertise!.toLowerCase())
+        );
+        if (!matchesExpertise) return false;
+      }
+      
+      return true;
+    });
+
+    return {
+      success: true,
+      data: JSON.parse(JSON.stringify(opportunities)),
+    };
+  } catch (error: any) {
+    console.error("Error fetching staff opportunities:", error);
+    return { success: false, error: error.message || "Failed to fetch opportunities" };
+  }
+}
