@@ -9,7 +9,29 @@ export async function publishEvent(data: WizardData) {
     console.log("Publishing event to MongoDB:", data.title);
     await dbConnect();
     
-    const newEvent = new Event(data);
+    // Transform data to match new Event schema
+    const eventData = {
+      ...data,
+      date: new Date(data.date),
+      ticketPrice: parseFloat(data.ticketPrice),
+      totalQuantity: parseInt(data.totalQuantity, 10),
+      staffRolesNeeded: data.staffRoles.map(role => ({
+        roleName: role.name,
+        count: role.headcount,
+        assignedStaff: [] // Initialize empty assigned staff
+      })),
+      location: {
+        type: 'Point',
+        address: 'Offline', // Default for now
+        coordinates: [0, 0] // Default for now
+      },
+      status: 'published' // Default to published when from wizard
+    };
+
+    // Remove old field name
+    delete (eventData as any).staffRoles;
+
+    const newEvent = new Event(eventData);
     const savedEvent = await newEvent.save();
 
     revalidatePath("/(admin)/manage-events");
