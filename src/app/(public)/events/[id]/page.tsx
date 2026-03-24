@@ -108,7 +108,7 @@ export default async function EventDetailsPage({ params }: { params: Promise<{ i
           <section className="bg-surface-container-low/50 p-10 rounded-2xl border border-outline-variant/10 space-y-8">
             <h2 className="text-2xl font-headline font-bold text-on-surface">Who Should Attend</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {data.attendeeTypes.map((type, i) => (
+              {data.attendeeTypes.map((type: { name: string; description: string; icon: string }, i: number) => (
                 <div key={i} className="bg-surface-container-lowest p-6 rounded-xl flex items-start gap-4 border border-outline-variant/10">
                   <div className="bg-primary-container text-on-primary-container p-3 rounded-md">
                     <span className="material-symbols-outlined">{type.icon}</span>
@@ -126,7 +126,7 @@ export default async function EventDetailsPage({ params }: { params: Promise<{ i
           <section className="space-y-10">
             <h2 className="text-3xl font-headline font-bold text-on-surface">Featured Speakers</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-              {data.speakers.map((speaker, i) => (
+              {data.speakers.map((speaker: { name: string; role: string; company: string; imageUrl: string }, i: number) => (
                 <div key={i} className="group">
                   <div className="relative overflow-hidden rounded-xl aspect-square mb-4 shadow-sm">
                     <img 
