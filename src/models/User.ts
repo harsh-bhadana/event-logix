@@ -1,0 +1,64 @@
+import mongoose, { Schema, Document } from "mongoose";
+
+export interface IUser extends Document {
+  name: string;
+  email: string;
+  password: string;
+  role: 'admin' | 'staff' | 'public';
+  staffProfile?: {
+    skills: string[];
+    isVerified: boolean;
+    profileImage?: string;
+    bio?: string;
+    yearsOfExperience?: string;
+    noticePeriod?: string;
+    customTags?: string[];
+    availability?: {
+      monday: boolean;
+      tuesday: boolean;
+      wednesday: boolean;
+      thursday: boolean;
+      friday: boolean;
+      saturday: boolean;
+      sunday: boolean;
+    };
+    verificationDocs?: string[];
+  };
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+const UserSchema = new Schema<IUser>(
+  {
+    name: { type: String, required: true },
+    email: { type: String, unique: true, required: true },
+    password: { type: String, required: true },
+    role: { 
+      type: String, 
+      enum: ['admin', 'staff', 'public'], 
+      default: 'public' 
+    },
+    staffProfile: {
+      skills: [String],
+      isVerified: { type: Boolean, default: false },
+      profileImage: String,
+      bio: String,
+      yearsOfExperience: String,
+      noticePeriod: String,
+      customTags: [String],
+      availability: {
+        monday: { type: Boolean, default: true },
+        tuesday: { type: Boolean, default: true },
+        wednesday: { type: Boolean, default: true },
+        thursday: { type: Boolean, default: true },
+        friday: { type: Boolean, default: true },
+        saturday: { type: Boolean, default: false },
+        sunday: { type: Boolean, default: false },
+      },
+      verificationDocs: [String]
+    }
+  },
+  { timestamps: true }
+);
+
+export default mongoose.models.User || mongoose.model<IUser>("User", UserSchema);
