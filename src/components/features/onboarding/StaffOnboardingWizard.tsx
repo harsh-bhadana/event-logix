@@ -2,15 +2,15 @@
 
 import React from "react";
 import { useStaffOnboarding } from "@/hooks/useStaffOnboarding";
-import Step1Account from "./Step1Account";
-import Step2Professional from "./Step2Professional";
-import Step3SkillsRoles from "./Step3SkillsRoles";
-import Step4VerificationAvailability from "./Step4VerificationAvailability";
+import Step1Account from "@/components/features/onboarding/Step1Account";
+import Step2Professional from "@/components/features/onboarding/Step2Professional";
+import Step3SkillsRoles from "@/components/features/onboarding/Step3SkillsRoles";
+import Step4VerificationAvailability from "@/components/features/onboarding/Step4VerificationAvailability";
 
 const STEPS = [
   { id: 1, name: "Account Details", icon: "account_circle" },
   { id: 2, name: "Professional Details", icon: "person" },
-  { id: 3, name: "Skills & Roles", icon: "psychology" },
+  { id: 3, name: "Skills &amp; Roles", icon: "psychology" },
   { id: 4, name: "Verification", icon: "verified_user" },
 ];
 

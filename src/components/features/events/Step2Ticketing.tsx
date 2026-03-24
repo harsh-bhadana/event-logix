@@ -18,9 +18,9 @@ export function Step2Ticketing() {
     <div className="p-12 max-w-5xl mx-auto w-full animate-fade-in">
       <header className="mb-12">
         <span className="text-xs font-bold uppercase tracking-widest text-primary mb-2 block">Step 2 of 4</span>
-        <h2 className="text-4xl font-headline font-extrabold text-on-surface tracking-tight mb-4">Ticketing & Pricing</h2>
+        <h2 className="text-4xl font-headline font-extrabold text-on-surface tracking-tight mb-4">Ticketing &amp; Pricing</h2>
         <p className="text-on-surface-variant max-w-2xl leading-relaxed">
-          Define your event's economic model. Choose between a paid ticketing structure or a free RSVP-based attendance model.
+          Define your event&apos;s economic model. Choose between a paid ticketing structure or a free RSVP-based attendance model.
         </p>
       </header>
 

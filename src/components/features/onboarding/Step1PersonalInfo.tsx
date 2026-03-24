@@ -15,7 +15,7 @@ export default function Step1PersonalInfo() {
     <form onSubmit={handleNext} className="space-y-6">
       <div className="space-y-2">
         <h2 className="text-3xl font-headline font-bold text-on-surface">Build your Staff Profile</h2>
-        <p className="text-on-surface-variant font-body mb-8">Let's start with your basic information.</p>
+        <p className="text-on-surface-variant font-body mb-8">Let&apos;s start with your basic information.</p>
       </div>
 
       <div className="space-y-4">

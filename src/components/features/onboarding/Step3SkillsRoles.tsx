@@ -34,7 +34,7 @@ export default function Step3SkillsRoles() {
   return (
     <div className="space-y-12 animate-in fade-in slide-in-from-right-4 duration-500">
       <div className="space-y-4">
-        <h3 className="text-xl font-headline font-bold text-on-surface">Skills & Roles</h3>
+        <h3 className="text-xl font-headline font-bold text-on-surface">Skills &amp; Roles</h3>
         <p className="text-on-surface-variant text-sm">Define your expertise within high-end event management.</p>
       </div>
 
