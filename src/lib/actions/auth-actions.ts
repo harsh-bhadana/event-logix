@@ -74,7 +74,9 @@ export async function login(formData: FormData) {
     await login_session({ 
       id: user._id.toString(), 
       email: user.email, 
-      role: user.role 
+      role: user.role,
+      onboardingStatus: user.staffProfile?.onboardingStatus,
+      isVerified: user.staffProfile?.isVerified
     });
 
     return { success: true, role: user.role };

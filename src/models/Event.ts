@@ -40,6 +40,7 @@ export interface IEvent extends Document {
     icon: string;
   }>;
   status: 'draft' | 'published' | 'cancelled';
+  isFeatured: boolean;
   createdBy: mongoose.Types.ObjectId;
   createdAt: Date;
   updatedAt: Date;
@@ -64,6 +65,7 @@ const EventSchema = new Schema<IEvent>(
       address: String,
       coordinates: [Number] // [longitude, latitude]
     },
+    isFeatured: { type: Boolean, default: false },
     accessModel: { type: String, enum: ["paid", "free"], required: true },
     ticketTypes: [{
       name: String,

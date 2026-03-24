@@ -2,7 +2,13 @@ import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
 import { encrypt, decrypt } from "./jwt";
 
-export async function login_session(user: { id: string; email: string; role: string }) {
+export async function login_session(user: { 
+  id: string; 
+  email: string; 
+  role: string;
+  onboardingStatus?: string;
+  isVerified?: boolean;
+}) {
   // Verify credentials && get the user
 
   const expires = new Date(Date.now() + 2 * 60 * 60 * 1000);

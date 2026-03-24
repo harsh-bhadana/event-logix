@@ -42,8 +42,14 @@ export default async function middleware(req: NextRequest) {
       return NextResponse.redirect(new URL("/staff/jobs", req.nextUrl)); // Or another safe route
     }
 
-    if (isStaffRoute && role !== 'staff' && role !== 'admin') {
-      return NextResponse.redirect(new URL("/login", req.nextUrl));
+    if (isStaffRoute && role === 'staff') {
+      const isVerified = session.user.isVerified;
+      const onboardingStatus = session.user.onboardingStatus;
+      
+      // If not approved and not already on onboarding page, redirect
+      if (onboardingStatus !== 'approved' && path !== "/staff/onboarding") {
+        return NextResponse.redirect(new URL("/staff/onboarding", req.nextUrl));
+      }
     }
   }
 

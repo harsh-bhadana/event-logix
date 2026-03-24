@@ -8,6 +8,7 @@ export interface IUser extends Document {
   staffProfile?: {
     skills: string[];
     isVerified: boolean;
+    onboardingStatus: 'pending' | 'approved' | 'rejected';
     profileImage?: string;
     bio?: string;
     yearsOfExperience?: string;
@@ -41,6 +42,11 @@ const UserSchema = new Schema<IUser>(
     staffProfile: {
       skills: [String],
       isVerified: { type: Boolean, default: false },
+      onboardingStatus: { 
+        type: String, 
+        enum: ['pending', 'approved', 'rejected'], 
+        default: 'pending' 
+      },
       profileImage: String,
       bio: String,
       yearsOfExperience: String,
