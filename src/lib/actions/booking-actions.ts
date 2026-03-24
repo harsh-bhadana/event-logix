@@ -14,6 +14,11 @@ export interface BookTicketInput {
   eventId: string;
   ticketType: string;
   quantity: number;
+  attendeeInfo?: {
+    name: string;
+    email: string;
+    phone: string;
+  };
 }
 
 export async function bookTicket(input: BookTicketInput) {
@@ -54,6 +59,8 @@ export async function bookTicket(input: BookTicketInput) {
       quantity: input.quantity,
       totalAmount,
       paymentStatus: ticket.price === 0 ? "completed" : "pending",
+      attendeeInfo: input.attendeeInfo,
+      qrCode: ticket.price === 0 ? "" : undefined, // Placeholder
     });
     await booking.save();
 
@@ -72,6 +79,51 @@ export async function bookTicket(input: BookTicketInput) {
   } catch (error: any) {
     console.error("bookTicket error:", error);
     return { success: false, message: error.message || "Failed to book ticket." };
+  }
+}
+
+export async function completeBookingPayment(bookingId: string) {
+  try {
+    await dbConnect();
+    const session = await getSession();
+    if (!session?.user) {
+      return { success: false, message: "You must be logged in to complete payment." };
+    }
+
+    const booking = await Booking.findById(bookingId);
+    if (!booking) return { success: false, message: "Booking not found." };
+
+    // Simulating payment success
+    booking.paymentStatus = "completed";
+    booking.paymentId = `PAY-${Math.random().toString(36).toUpperCase().substring(2, 10)}`;
+    booking.qrCode = booking._id.toString();
+
+    await booking.save();
+
+    revalidatePath("/dashboard");
+    revalidatePath("/events/success");
+
+    return { success: true, message: "Payment completed successfully!" };
+  } catch (error: any) {
+    console.error("completeBookingPayment error:", error);
+    return { success: false, message: error.message || "Payment failed." };
+  }
+}
+
+export async function getUserBookings() {
+  try {
+    await dbConnect();
+    const session = await getSession();
+    if (!session?.user) return { success: false, bookings: [] };
+
+    const bookings = await Booking.find({ user: session.user.id })
+      .populate("event")
+      .sort({ createdAt: -1 });
+
+    return { success: true, bookings: JSON.parse(JSON.stringify(bookings)) };
+  } catch (error: any) {
+    console.error("getUserBookings error:", error);
+    return { success: false, bookings: [] };
   }
 }
 
