@@ -179,3 +179,36 @@ export async function getAdminEvents(filters?: { search?: string; status?: strin
     };
   }
 }
+
+export async function getFeaturedEvents() {
+  try {
+    await dbConnect();
+    const events = await Event.find({ isFeatured: true, status: 'published' })
+      .sort({ date: 1 })
+      .limit(6)
+      .lean();
+    
+    // Enhance with booking and ticket info
+    const enhancedEvents = await Promise.all(events.map(async (event: any) => {
+      const bookingsCount = await Booking.countDocuments({ 
+        event: event._id,
+        paymentStatus: 'completed'
+      });
+      const totalTickets = event.ticketTypes.reduce((acc: number, type: any) => acc + (type.quantity || 0), 0);
+      
+      return {
+        ...event,
+        bookingsCount,
+        totalTickets
+      };
+    }));
+
+    return {
+      success: true,
+      data: JSON.parse(JSON.stringify(enhancedEvents))
+    };
+  } catch (error: any) {
+    console.error("Error fetching featured events:", error);
+    return { success: false, data: [] };
+  }
+}

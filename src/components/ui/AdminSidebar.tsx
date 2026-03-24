@@ -9,9 +9,9 @@ export function AdminSidebar() {
   const navItems = [
     { label: "Dashboard", href: "/admin", icon: "dashboard" },
     { label: "Events", href: "/admin/manage-events", icon: "calendar_today" },
+    { label: "Staff Apps", href: "/admin/staff/applications", icon: "badge" },
+    { label: "Master Roster", href: "/admin/staff/roster", icon: "assignment_ind" },
     { label: "Venues", href: "#", icon: "location_on" },
-    { label: "Attendees", href: "#", icon: "group" },
-    { label: "Staff", href: "#", icon: "badge" },
     { label: "Finances", href: "#", icon: "payments" },
   ];
 
