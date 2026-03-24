@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { logout } from "@/lib/actions/auth-actions";
 
 export function AdminSidebar() {
   const pathname = usePathname();
@@ -74,6 +75,15 @@ export function AdminSidebar() {
             <span>{item.label}</span>
           </Link>
         ))}
+        <form action={logout}>
+          <button
+            type="submit"
+            className="w-full flex items-center gap-3 px-4 py-3 text-error hover:bg-error/5 transition-all duration-200 group rounded-r-full mr-4 hover:translate-x-1"
+          >
+            <span className="material-symbols-outlined text-xl">logout</span>
+            <span className="font-bold">Logout</span>
+          </button>
+        </form>
       </div>
     </aside>
   );

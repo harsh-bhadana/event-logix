@@ -1,4 +1,5 @@
 import { getSession } from "@/lib/auth";
+import { logout } from "@/lib/actions/auth-actions";
 
 interface TopAppBarProps {
   title?: string;
@@ -51,6 +52,15 @@ export async function TopAppBar({ title = "Event Logix" }: TopAppBarProps) {
         >
           {initials}
         </div>
+        <form action={logout}>
+          <button
+            type="submit"
+            title="Logout"
+            className="hover:bg-error/5 text-error transition-colors p-2 rounded-full active:opacity-80"
+          >
+            <span className="material-symbols-outlined">logout</span>
+          </button>
+        </form>
       </div>
     </header>
   );

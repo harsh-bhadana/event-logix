@@ -1,25 +1,40 @@
+"use client";
+
+import React from "react";
 import { TopAppBar } from "@/components/ui/TopAppBar";
 import Link from "next/link";
+import { logout } from "@/lib/actions/auth-actions";
 
 export default function StaffLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const [isMenuOpen, setIsMenuOpen] = React.useState(false);
+
   return (
     <div className="min-h-screen bg-surface">
       {/* TopAppBar */}
       <header className="bg-[#fbf9f7] dark:bg-slate-900 border-b border-surface-container fixed w-full top-0 z-50 h-16">
         <div className="flex justify-between items-center px-8 h-full w-full max-w-7xl mx-auto">
-          <div className="text-primary dark:text-[#afefdd] font-extrabold tracking-tighter text-xl">
-            Executive Event Ledger
+          {/* Logo & Mobile Menu Toggle */}
+          <div className="flex items-center gap-3">
+            <button 
+              onClick={() => setIsMenuOpen(!isMenuOpen)}
+              className="lg:hidden p-2 rounded-lg hover:bg-surface-container-low dark:hover:bg-slate-800 transition-colors"
+            >
+              <span className="material-symbols-outlined text-primary dark:text-[#afefdd]">
+                {isMenuOpen ? 'close' : 'menu'}
+              </span>
+            </button>
+            <div className="text-primary dark:text-[#afefdd] font-extrabold tracking-tighter text-xl">
+              Logix Staff
+            </div>
           </div>
+
           <nav className="hidden md:flex items-center gap-8">
-            <Link href="/staff/jobs" className="text-primary dark:text-[#afefdd] border-b-2 border-primary pb-1 font-headline font-bold text-lg tracking-tight">
+            <Link href="/staff/jobs" className="text-on-surface-variant dark:text-slate-400 font-medium hover:text-primary font-headline font-bold text-lg tracking-tight">
               Opportunities
-            </Link>
-            <Link href="#" className="text-on-surface-variant dark:text-slate-400 font-medium hover:text-primary font-headline font-bold text-lg tracking-tight">
-              Schedule
             </Link>
             <Link href="/staff/earnings" className="text-on-surface-variant dark:text-slate-400 font-medium hover:text-primary font-headline font-bold text-lg tracking-tight">
               Earnings
@@ -29,11 +44,38 @@ export default function StaffLayout({
             <button className="p-2 rounded-full hover:bg-surface-container-low dark:hover:bg-slate-800 transition-colors duration-200">
               <span className="material-symbols-outlined text-primary dark:text-[#afefdd]">notifications</span>
             </button>
-            <button className="p-2 rounded-full hover:bg-surface-container-low dark:hover:bg-slate-800 transition-colors duration-200">
-              <span className="material-symbols-outlined text-primary dark:text-[#afefdd]">account_circle</span>
-            </button>
+            <form action={logout}>
+              <button
+                type="submit"
+                className="p-2 rounded-full hover:bg-red-50 dark:hover:bg-red-500/10 text-red-500 transition-colors duration-200"
+              >
+                <span className="material-symbols-outlined">logout</span>
+              </button>
+            </form>
           </div>
         </div>
+
+        {/* Mobile Dropdown */}
+        {isMenuOpen && (
+          <div className="lg:hidden absolute top-16 left-0 w-full bg-[#fbf9f7] dark:bg-slate-900 border-b border-surface-container shadow-xl animate-in slide-in-from-top-2 duration-300 z-50">
+            <nav className="flex flex-col p-4 gap-1">
+              <Link 
+                href="/staff/jobs" 
+                onClick={() => setIsMenuOpen(false)}
+                className="flex items-center gap-3 px-4 py-4 text-on-surface-variant dark:text-slate-400 font-bold border-b border-slate-100 dark:border-slate-800"
+              >
+                <span className="material-symbols-outlined">work</span> Opportunities
+              </Link>
+              <Link 
+                href="/staff/earnings" 
+                onClick={() => setIsMenuOpen(false)}
+                className="flex items-center gap-3 px-4 py-4 text-on-surface-variant dark:text-slate-400 font-bold border-b border-slate-100 dark:border-slate-800"
+              >
+                <span className="material-symbols-outlined">payments</span> Earnings
+              </Link>
+            </nav>
+          </div>
+        )}
       </header>
 
       <div className="flex pt-16">
@@ -59,6 +101,14 @@ export default function StaffLayout({
             <Link href="#" className="flex items-center gap-3 px-4 py-3 text-on-surface-variant dark:text-slate-400 hover:bg-surface-container-high dark:hover:bg-slate-700/50 hover:translate-x-1 transition-transform duration-200 font-body text-sm font-medium">
               <span className="material-symbols-outlined">settings</span> Settings
             </Link>
+            <form action={logout}>
+              <button
+                type="submit"
+                className="w-full flex items-center gap-3 px-4 py-3 text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 hover:translate-x-1 transition-all duration-200 font-body text-sm font-bold"
+              >
+                <span className="material-symbols-outlined">logout</span> Logout
+              </button>
+            </form>
           </nav>
           <Link href="/staff/earnings" className="mt-auto bg-primary text-on-primary py-3 px-4 rounded-xl font-bold text-sm shadow-sm hover:opacity-90 transition-opacity text-center">
             View Payroll
