@@ -21,7 +21,7 @@ export default function StaffLayout({
             <Link href="#" className="text-on-surface-variant dark:text-slate-400 font-medium hover:text-primary font-headline font-bold text-lg tracking-tight">
               Schedule
             </Link>
-            <Link href="#" className="text-on-surface-variant dark:text-slate-400 font-medium hover:text-primary font-headline font-bold text-lg tracking-tight">
+            <Link href="/staff/earnings" className="text-on-surface-variant dark:text-slate-400 font-medium hover:text-primary font-headline font-bold text-lg tracking-tight">
               Earnings
             </Link>
           </nav>
@@ -60,9 +60,9 @@ export default function StaffLayout({
               <span className="material-symbols-outlined">settings</span> Settings
             </Link>
           </nav>
-          <button className="mt-auto bg-primary text-on-primary py-3 px-4 rounded-xl font-bold text-sm shadow-sm hover:opacity-90 transition-opacity">
+          <Link href="/staff/earnings" className="mt-auto bg-primary text-on-primary py-3 px-4 rounded-xl font-bold text-sm shadow-sm hover:opacity-90 transition-opacity text-center">
             View Payroll
-          </button>
+          </Link>
         </aside>
 
         {/* Main Content Area */}

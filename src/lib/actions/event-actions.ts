@@ -223,3 +223,19 @@ export async function getFeaturedEvents() {
     return { success: false, data: [] };
   }
 }
+
+export async function getEventById(id: string) {
+  try {
+    await dbConnect();
+    const event = await Event.findById(id).lean();
+    if (!event) return { success: false, error: "Event not found" };
+
+    return {
+      success: true,
+      data: JSON.parse(JSON.stringify(event))
+    };
+  } catch (error: any) {
+    console.error("Error fetching event by ID:", error);
+    return { success: false, error: error.message || "Failed to fetch event" };
+  }
+}

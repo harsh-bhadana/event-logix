@@ -19,6 +19,8 @@ export const metadata: Metadata = {
   description: "A premium event management platform.",
 };
 
+import { Toaster } from "sonner";
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -34,6 +36,7 @@ export default function RootLayout({
       </head>
       <body className={`${manrope.variable} ${inter.variable} font-body antialiased bg-background text-on-background`}>
         {children}
+        <Toaster richColors position="top-center" />
       </body>
     </html>
   );

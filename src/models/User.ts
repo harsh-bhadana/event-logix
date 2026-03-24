@@ -60,6 +60,7 @@ const UserSchema = new Schema<IUser>(
         enum: ['pending', 'approved', 'rejected'], 
         default: 'pending' 
       },
+      rejectionReason: String,
       profileImage: String,
       bio: String,
       yearsOfExperience: String,
@@ -96,4 +97,4 @@ const UserSchema = new Schema<IUser>(
   { timestamps: true }
 );
 
-export default mongoose.models.User || mongoose.mode
+export default mongoose.models.User || mongoose.model<IUser>("User", UserSchema);
