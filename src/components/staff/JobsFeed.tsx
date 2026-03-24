@@ -11,11 +11,7 @@ interface JobsFeedProps {
 
 export function JobsFeed({ initialOpportunities }: JobsFeedProps) {
   const [selectedEvent, setSelectedEvent] = useState<IEvent | null>(null);
-  
-  const handleApply = (event: IEvent) => {
-    alert(`Applying for ${event.title}! This feature will be fully implemented soon.`);
-    setSelectedEvent(null);
-  };
+
 
   if (initialOpportunities.length === 0) {
     return (
@@ -34,17 +30,16 @@ export function JobsFeed({ initialOpportunities }: JobsFeedProps) {
   return (
     <div className="grid gap-4">
       {initialOpportunities.map((event) => (
-        <JobCard 
-          key={event._id.toString()} 
-          event={event} 
+        <JobCard
+          key={event._id.toString()}
+          event={event}
           onViewDetails={setSelectedEvent}
         />
       ))}
-      
-      <JobDetailDrawer 
-        event={selectedEvent} 
-        onClose={() => setSelectedEvent(null)} 
-        onApply={handleApply}
+
+      <JobDetailDrawer
+        event={selectedEvent}
+        onClose={() => setSelectedEvent(null)}
       />
     </div>
   );

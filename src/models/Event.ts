@@ -28,6 +28,14 @@ export interface IEvent extends Document {
   taxInclusive: boolean;
   showFeeBreakdown: boolean;
   staffRolesNeeded: IStaffRoleNeeded[];
+  /** Generic lineup entry — works for performers, speakers, artists, instructors, hosts, etc. */
+  lineup?: Array<{
+    name: string;
+    role: string;
+    org?: string;
+    imageUrl?: string;
+  }>;
+  /** @deprecated use lineup instead */
   speakers?: Array<{
     name: string;
     role: string;
@@ -76,6 +84,12 @@ const EventSchema = new Schema<IEvent>(
     taxInclusive: { type: Boolean, default: true },
     showFeeBreakdown: { type: Boolean, default: false },
     staffRolesNeeded: [StaffRoleNeededSchema],
+    lineup: [{
+      name: String,
+      role: String,
+      org: String,
+      imageUrl: String
+    }],
     speakers: [{
       name: String,
       role: String,

@@ -6,6 +6,14 @@ import { useDebounce } from "@/hooks/useDebounce"; // I'll check if this exists 
 import { EventsTable } from "./EventsTable";
 import Link from "next/link";
 
+interface Insights {
+  totalEvents: number;
+  publishedEvents: number;
+  revenue: number;
+  ticketsSold: number;
+  staffCount: number;
+}
+
 interface AdminEventsClientProps {
   initialData: {
     events: any[];
@@ -13,9 +21,10 @@ interface AdminEventsClientProps {
     page: number;
     pages: number;
   };
+  insights?: Insights | null;
 }
 
-export function AdminEventsClient({ initialData }: AdminEventsClientProps) {
+export function AdminEventsClient({ initialData, insights }: AdminEventsClientProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
   
@@ -121,26 +130,32 @@ export function AdminEventsClient({ initialData }: AdminEventsClientProps) {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-12">
         <div className="p-6 rounded-3xl bg-surface-container-low/40">
           <p className="text-xs font-bold text-on-surface-variant uppercase tracking-widest mb-4">Total Revenue</p>
-          <h3 className="text-3xl font-black text-on-surface tracking-tighter font-headline">$124,500.00</h3>
+          <h3 className="text-3xl font-black text-on-surface tracking-tighter font-headline">
+            {insights ? `$${insights.revenue.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` : "—"}
+          </h3>
           <div className="mt-4 inline-flex items-center gap-1.5 px-2 py-1 rounded bg-tertiary-container text-on-tertiary-container text-[10px] font-bold">
-            <span className="material-symbols-outlined text-xs">trending_up</span>
-            +12.4% vs last month
+            <span className="material-symbols-outlined text-xs">payments</span>
+            {insights ? `${insights.ticketsSold} tickets sold` : "No data yet"}
           </div>
         </div>
         <div className="p-6 rounded-3xl bg-surface-container-low/40">
-          <p className="text-xs font-bold text-on-surface-variant uppercase tracking-widest mb-4">Avg Attendance</p>
-          <h3 className="text-3xl font-black text-on-surface tracking-tighter font-headline">88.4%</h3>
-          <div className="mt-4 inline-flex items-center gap-1.5 px-2 py-1 rounded bg-tertiary-container text-on-tertiary-container text-[10px] font-bold">
-            <span className="material-symbols-outlined text-xs">trending_up</span>
-            High efficiency
+          <p className="text-xs font-bold text-on-surface-variant uppercase tracking-widest mb-4">Published Events</p>
+          <h3 className="text-3xl font-black text-on-surface tracking-tighter font-headline">
+            {insights ? `${insights.publishedEvents} / ${insights.totalEvents}` : "—"}
+          </h3>
+          <div className="mt-4 inline-flex items-center gap-1.5 px-2 py-1 rounded bg-primary-container text-on-primary-container text-[10px] font-bold">
+            <span className="material-symbols-outlined text-xs">event</span>
+            Live on platform
           </div>
         </div>
         <div className="p-6 rounded-3xl bg-surface-container-low/40">
-          <p className="text-xs font-bold text-on-surface-variant uppercase tracking-widest mb-4">Staff Retention</p>
-          <h3 className="text-3xl font-black text-on-surface tracking-tighter font-headline">96.2%</h3>
+          <p className="text-xs font-bold text-on-surface-variant uppercase tracking-widest mb-4">Verified Staff</p>
+          <h3 className="text-3xl font-black text-on-surface tracking-tighter font-headline">
+            {insights ? insights.staffCount : "—"}
+          </h3>
           <div className="mt-4 inline-flex items-center gap-1.5 px-2 py-1 rounded bg-surface-container-highest text-on-surface-variant text-[10px] font-bold">
-            <span className="material-symbols-outlined text-xs">remove</span>
-            Stable team
+            <span className="material-symbols-outlined text-xs">badge</span>
+            Approved providers
           </div>
         </div>
       </div>
