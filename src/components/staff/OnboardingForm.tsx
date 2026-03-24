@@ -4,8 +4,14 @@ import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { submitOnboarding } from "@/lib/actions/staff-actions";
 
+interface OnboardingUser {
+  id: string;
+  name?: string;
+  email?: string;
+}
+
 interface OnboardingFormProps {
-  user: any;
+  user: OnboardingUser;
 }
 
 export function OnboardingForm({ user }: OnboardingFormProps) {

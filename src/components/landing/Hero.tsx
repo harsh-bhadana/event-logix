@@ -67,8 +67,8 @@ export function Hero() {
               Explore Events
               <span className="material-symbols-outlined ml-2 text-lg align-middle group-hover:translate-x-1 transition-transform">arrow_forward</span>
             </Link>
-            <Link 
-              href="/admin/manage-events/new" 
+            <Link
+              href="/signup"
               className="w-full sm:w-auto px-10 py-5 bg-surface-container-highest text-on-surface rounded-2xl font-bold text-base hover:bg-surface-bright transition-all active:scale-95 text-center"
             >
               Host an Event
