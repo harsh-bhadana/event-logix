@@ -34,7 +34,7 @@ export function Newsletter() {
               placeholder="your@email.com" 
               className="flex-1 bg-white/10 border-2 border-white/20 rounded-2xl px-6 py-5 text-white placeholder:text-white/40 font-bold focus:ring-4 focus:ring-white/20 focus:border-white outline-none transition-all backdrop-blur-sm" 
             />
-            <button className="bg-white text-primary px-10 py-5 rounded-2xl font-black text-sm uppercase tracking-widest hover:scale-105 active:scale-95 transition-all shadow-xl">
+            <button type="button" className="bg-white text-primary px-10 py-5 rounded-2xl font-black text-sm uppercase tracking-widest hover:scale-105 active:scale-95 transition-all shadow-xl">
               Subscribe
             </button>
           </form>

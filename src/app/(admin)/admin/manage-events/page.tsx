@@ -1,5 +1,7 @@
 import { getAdminEvents } from "@/lib/actions/event-actions";
+import { getAdminInsights } from "@/lib/actions/booking-actions";
 import { AdminEventsClient } from "@/components/admin/AdminEventsClient";
+import { TableRowSkeleton } from "@/components/ui/Loader";
 import { Suspense } from "react";
 
 interface ManageEventsPageProps {
@@ -12,15 +14,18 @@ interface ManageEventsPageProps {
 
 export default async function ManageEventsPage({ searchParams }: ManageEventsPageProps) {
   const params = await searchParams;
-  
+
   const filters = {
     search: params.search,
     status: params.status,
-    page: params.page ? parseInt(params.page, 10) : 1
+    page: params.page ? parseInt(params.page, 10) : 1,
   };
 
-  const result = (await getAdminEvents(filters)) as any;
-  
+  const [result, insightsResult] = await Promise.all([
+    getAdminEvents(filters) as any,
+    getAdminInsights(),
+  ]);
+
   const initialData = {
     events: result.success ? result.data : [],
     total: result.success ? result.total : 0,
@@ -28,9 +33,11 @@ export default async function ManageEventsPage({ searchParams }: ManageEventsPag
     pages: result.success ? result.pages : 1,
   };
 
+  const insights = insightsResult.success ? insightsResult.data : null;
+
   return (
-    <Suspense fallback={<div className="p-10 animate-pulse">Loading events...</div>}>
-      <AdminEventsClient initialData={initialData} />
+    <Suspense fallback={<div className="px-10 py-10"><TableRowSkeleton rows={8} /></div>}>
+      <AdminEventsClient initialData={initialData} insights={insights} />
     </Suspense>
   );
 }

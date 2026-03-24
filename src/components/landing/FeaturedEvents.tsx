@@ -6,8 +6,20 @@ import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { format } from 'date-fns';
 
+interface EventSummary {
+  _id: string;
+  title: string;
+  date: string | Date;
+  locationName?: string;
+  imageUrl?: string | null;
+  category: string;
+  totalTickets: number;
+  bookingsCount: number;
+  ticketTypes: Array<{ name: string; price: number; quantity: number }>;
+}
+
 interface FeaturedEventsProps {
-  events: any[];
+  events: EventSummary[];
 }
 
 export function FeaturedEvents({ events }: FeaturedEventsProps) {

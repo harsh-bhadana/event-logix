@@ -9,33 +9,44 @@ export async function publishEvent(data: WizardData) {
   try {
     console.log("Publishing event to MongoDB:", data.title);
     await dbConnect();
-    
-    // Transform data to match new Event schema
+
+    // Build the ticketTypes array from wizard data
+    const ticketTypes =
+      data.accessModel === "free"
+        ? [{ name: "General Admission", price: 0, quantity: parseInt(data.totalQuantity, 10) || 0 }]
+        : [{ name: "Standard", price: parseFloat(data.ticketPrice) || 0, quantity: parseInt(data.totalQuantity, 10) || 0 }];
+
     const eventData = {
-      ...data,
+      title: data.title,
+      description: data.description,
+      imageUrl: data.bannerImage ?? null,
+      category: data.category,
       date: new Date(data.date),
-      ticketPrice: parseFloat(data.ticketPrice),
-      totalQuantity: parseInt(data.totalQuantity, 10),
-      staffRolesNeeded: data.staffRoles.map(role => ({
+      locationName: "TBD",
+      location: {
+        type: "Point" as const,
+        address: "TBD",
+        coordinates: [0, 0],
+      },
+      accessModel: data.accessModel,
+      ticketTypes,
+      pricingStrategy: data.pricingStrategy,
+      taxInclusive: data.taxInclusive,
+      showFeeBreakdown: data.showFeeBreakdown,
+      staffRolesNeeded: data.staffRoles.map((role) => ({
         roleName: role.name,
         count: role.headcount,
-        assignedStaff: [] // Initialize empty assigned staff
+        assignedStaff: [],
       })),
-      location: {
-        type: 'Point',
-        address: 'Offline', // Default for now
-        coordinates: [0, 0] // Default for now
-      },
-      status: 'published' // Default to published when from wizard
+      status: "published" as const,
+      isFeatured: false,
     };
-
-    // Remove old field name
-    delete (eventData as any).staffRoles;
 
     const newEvent = new Event(eventData);
     const savedEvent = await newEvent.save();
 
-    revalidatePath("/(admin)/manage-events");
+    revalidatePath("/admin/manage-events");
+    revalidatePath("/");
 
     return {
       success: true,
@@ -210,5 +221,21 @@ export async function getFeaturedEvents() {
   } catch (error: any) {
     console.error("Error fetching featured events:", error);
     return { success: false, data: [] };
+  }
+}
+
+export async function getEventById(id: string) {
+  try {
+    await dbConnect();
+    const event = await Event.findById(id).lean();
+    if (!event) return { success: false, error: "Event not found" };
+
+    return {
+      success: true,
+      data: JSON.parse(JSON.stringify(event))
+    };
+  } catch (error: any) {
+    console.error("Error fetching event by ID:", error);
+    return { success: false, error: error.message || "Failed to fetch event" };
   }
 }

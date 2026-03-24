@@ -1,24 +1,29 @@
-'use client';
+"use client";
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { logout } from "@/lib/actions/auth-actions";
 
 export function AdminSidebar() {
   const pathname = usePathname();
 
   const navItems = [
-    { label: "Dashboard", href: "/admin", icon: "dashboard" },
-    { label: "Events", href: "/admin/manage-events", icon: "calendar_today" },
-    { label: "Staff Apps", href: "/admin/staff/applications", icon: "badge" },
-    { label: "Master Roster", href: "/admin/staff/roster", icon: "assignment_ind" },
-    { label: "Venues", href: "#", icon: "location_on" },
-    { label: "Finances", href: "#", icon: "payments" },
+    { label: "Dashboard", href: "/admin", icon: "dashboard", exact: true },
+    { label: "Events", href: "/admin/manage-events", icon: "calendar_today", exact: false },
+    { label: "Staff Verification", href: "/admin/staff", icon: "verified_user", exact: false },
+    { label: "Gate Control", href: "/admin/events", icon: "qr_code_scanner", exact: false },
+    { label: "Finances", href: "#", icon: "payments", exact: false },
   ];
 
   const bottomItems = [
     { label: "Support", href: "#", icon: "headset_mic" },
     { label: "Archive", href: "#", icon: "inventory_2" },
   ];
+
+  const isActive = (href: string, exact: boolean) => {
+    if (href === "#") return false;
+    return exact ? pathname === href : pathname.startsWith(href);
+  };
 
   return (
     <aside className="hidden md:flex flex-col gap-2 py-6 px-4 h-screen w-64 fixed left-0 top-0 bg-surface-container-low z-40 transition-all font-body text-sm font-medium">
@@ -33,27 +38,27 @@ export function AdminSidebar() {
           </div>
         </div>
       </div>
-      
+
       <nav className="flex-1 space-y-1">
         {navItems.map((item) => {
-          const isActive = pathname.startsWith(item.href) && item.href !== "#";
+          const active = isActive(item.href, item.exact);
           return (
             <Link
               key={item.label}
               href={item.href}
               className={`flex items-center gap-3 px-4 py-3 transition-all duration-200 group ${
-                isActive
-                  ? "bg-surface-container-lowest text-primary shadow-[0_20px_40px_rgba(41,105,91,0.06)] rounded-r-full mr-4 scale-95 active:scale-100"
+                active
+                  ? "bg-surface-container-lowest text-primary shadow-[0_20px_40px_rgba(41,105,91,0.06)] rounded-r-full mr-4"
                   : "text-on-surface-variant hover:bg-[#ffffff40] hover:translate-x-1"
               }`}
             >
-              <span 
-                className={`material-symbols-outlined text-xl ${isActive ? "fill-1" : ""}`}
-                style={isActive ? { fontVariationSettings: "'FILL' 1" } : {}}
+              <span
+                className="material-symbols-outlined text-xl"
+                style={active ? { fontVariationSettings: "'FILL' 1" } : {}}
               >
                 {item.icon}
               </span>
-              <span className={isActive ? "font-semibold" : ""}>{item.label}</span>
+              <span className={active ? "font-semibold" : ""}>{item.label}</span>
             </Link>
           );
         })}
@@ -70,6 +75,15 @@ export function AdminSidebar() {
             <span>{item.label}</span>
           </Link>
         ))}
+        <form action={logout}>
+          <button
+            type="submit"
+            className="w-full flex items-center gap-3 px-4 py-3 text-error hover:bg-error/5 transition-all duration-200 group rounded-r-full mr-4 hover:translate-x-1"
+          >
+            <span className="material-symbols-outlined text-xl">logout</span>
+            <span className="font-bold">Logout</span>
+          </button>
+        </form>
       </div>
     </aside>
   );

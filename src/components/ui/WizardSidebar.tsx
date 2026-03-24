@@ -1,12 +1,7 @@
 "use client";
 
 import { useWizard } from "@/hooks/useEventWizard";
-import { clsx, type ClassValue } from "clsx";
-import { twMerge } from "tailwind-merge";
-
-function cn(...inputs: ClassValue[]) {
-  return twMerge(clsx(inputs));
-}
+import { cn } from "@/lib/cn";
 
 const steps = [
   { id: 1, title: "Basic Info", icon: "info" },
