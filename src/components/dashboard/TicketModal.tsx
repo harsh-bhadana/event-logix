@@ -47,7 +47,7 @@ export default function TicketModal({ isOpen, onClose, booking }: TicketModalPro
 
             <h4 className="font-headline font-bold text-lg mb-1 dark:text-white">Scan at Entry</h4>
             <p className="text-slate-500 text-sm px-4">
-              Please present this code at the main reception. This ticket is valid for {booking.quantity} attendee(s).
+              Please present this code at the main reception. This ticket is valid for {booking.quantity} attendee{booking.quantity > 1 ? 's' : ''}.
             </p>
 
             <div className="mt-8 pt-6 border-t border-slate-100 dark:border-slate-800 flex flex-col gap-3">

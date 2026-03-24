@@ -9,6 +9,7 @@ export interface IUser extends Document {
     skills: string[];
     isVerified: boolean;
     onboardingStatus: 'pending' | 'approved' | 'rejected';
+    rejectionReason?: string;
     profileImage?: string;
     bio?: string;
     yearsOfExperience?: string;
@@ -24,6 +25,18 @@ export interface IUser extends Document {
       sunday: boolean;
     };
     verificationDocs?: string[];
+    earnings?: {
+      balance: number;
+      lifetime: number;
+    };
+    shifts?: Array<{
+      eventId: string;
+      eventTitle: string;
+      date: Date;
+      role: string;
+      amount: number;
+      status: 'pending' | 'processing' | 'paid';
+    }>;
   };
   createdAt: Date;
   updatedAt: Date;
@@ -61,10 +74,26 @@ const UserSchema = new Schema<IUser>(
         saturday: { type: Boolean, default: false },
         sunday: { type: Boolean, default: false },
       },
-      verificationDocs: [String]
+      verificationDocs: [String],
+      earnings: {
+        balance: { type: Number, default: 0 },
+        lifetime: { type: Number, default: 0 }
+      },
+      shifts: [{
+        eventId: { type: Schema.Types.ObjectId, ref: 'Event' },
+        eventTitle: String,
+        date: Date,
+        role: String,
+        amount: Number,
+        status: { 
+          type: String, 
+          enum: ['pending', 'processing', 'paid'], 
+          default: 'pending' 
+        }
+      }]
     }
   },
   { timestamps: true }
 );
 
-export default mongoose.models.User || mongoose.model<IUser>("User", UserSchema);
+export default mongoose.models.User || mongoose.mode
