@@ -14,8 +14,8 @@ const STEPS = [
   { id: 4, name: "Verification", icon: "verified_user" },
 ];
 
-export default function StaffOnboardingWizard() {
-  const { currentStep, setCurrentStep } = useStaffOnboarding();
+export default function StaffOnboardingWizard({ user }: { user?: any }) {
+  const { currentStep, setCurrentStep, isExistingUser } = useStaffOnboarding();
 
   const renderStep = () => {
     switch (currentStep) {
@@ -44,7 +44,9 @@ export default function StaffOnboardingWizard() {
               className={`relative flex items-center gap-3 py-3 px-8 transition-all cursor-pointer ${
                 currentStep === step.id
                   ? "text-primary dark:text-[#afefdd] font-bold after:content-[''] after:absolute after:left-0 after:w-[2px] after:h-6 after:bg-primary"
-                  : "text-on-surface-variant dark:text-neutral-400 font-medium hover:text-primary"
+                  : (step.id < currentStep || (isExistingUser && step.id === 1))
+                  ? "text-on-surface-variant dark:text-neutral-400 font-medium hover:text-primary"
+                  : "text-on-surface-variant/30 dark:text-neutral-700 font-medium cursor-not-allowed pointer-events-none"
               }`}
             >
               <span className="material-symbols-outlined">{step.icon}</span>

@@ -58,20 +58,31 @@ type OnboardingContextType = {
   updateData: (newData: Partial<StaffOnboardingData>) => void;
   currentStep: number;
   setCurrentStep: (step: number) => void;
+  isExistingUser?: boolean;
 };
 
 const OnboardingContext = createContext<OnboardingContextType | undefined>(undefined);
 
-export function StaffOnboardingProvider({ children }: { children: ReactNode }) {
-  const [data, setData] = useState<StaffOnboardingData>(initialData);
-  const [currentStep, setCurrentStep] = useState(1);
+export function StaffOnboardingProvider({ 
+  children, 
+  initialStep = 1,
+  initialData: propsInitialData,
+  isExistingUser = false
+}: { 
+  children: ReactNode, 
+  initialStep?: number,
+  initialData?: Partial<StaffOnboardingData>,
+  isExistingUser?: boolean
+}) {
+  const [data, setData] = useState<StaffOnboardingData>({ ...initialData, ...propsInitialData });
+  const [currentStep, setCurrentStep] = useState(initialStep);
 
   const updateData = (newData: Partial<StaffOnboardingData>) => {
     setData((prev) => ({ ...prev, ...newData }));
   };
 
   return (
-    <OnboardingContext.Provider value={{ data, updateData, currentStep, setCurrentStep }}>
+    <OnboardingContext.Provider value={{ data, updateData, currentStep, setCurrentStep, isExistingUser }}>
       {children}
     </OnboardingContext.Provider>
   );

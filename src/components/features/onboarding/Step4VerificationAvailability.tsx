@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import { useStaffOnboarding } from "@/hooks/useStaffOnboarding";
 import { registerStaff } from "@/lib/actions/auth-actions";
+import { completeStaffOnboarding } from "@/lib/actions/staff-actions";
 import { useRouter } from "next/navigation";
 
 const DAYS = [
@@ -16,7 +17,7 @@ const DAYS = [
 ];
 
 export default function Step4VerificationAvailability() {
-  const { data, updateData, setCurrentStep } = useStaffOnboarding();
+  const { data, updateData, setCurrentStep, isExistingUser } = useStaffOnboarding();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [shortNotice, setShortNotice] = useState(true);
   const [remotePreferred, setRemotePreferred] = useState(false);
@@ -34,10 +35,13 @@ export default function Step4VerificationAvailability() {
   const handleSubmit = async () => {
     setIsSubmitting(true);
     try {
-      const result = await registerStaff(data);
+      const result = isExistingUser 
+        ? await completeStaffOnboarding(data)
+        : await registerStaff(data);
+        
       if (result.success) {
         alert(result.message);
-        router.push("/");
+        router.push(isExistingUser ? "/staff/jobs" : "/");
       } else {
         alert(result.message);
       }

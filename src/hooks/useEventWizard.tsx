@@ -52,12 +52,21 @@ type WizardContextType = {
   updateData: (newData: Partial<WizardData>) => void;
   currentStep: number;
   setCurrentStep: (step: number) => void;
+  eventId?: string;
 };
 
 const WizardContext = createContext<WizardContextType | undefined>(undefined);
 
-export function WizardProvider({ children }: { children: ReactNode }) {
-  const [data, setData] = useState<WizardData>(initialData);
+export function WizardProvider({ 
+  children, 
+  initialData: propsInitialData,
+  eventId 
+}: { 
+  children: ReactNode, 
+  initialData?: WizardData,
+  eventId?: string
+}) {
+  const [data, setData] = useState<WizardData>(propsInitialData || initialData);
   const [currentStep, setCurrentStep] = useState(1);
 
   const updateData = (newData: Partial<WizardData>) => {
@@ -65,7 +74,7 @@ export function WizardProvider({ children }: { children: ReactNode }) {
   };
 
   return (
-    <WizardContext.Provider value={{ data, updateData, currentStep, setCurrentStep }}>
+    <WizardContext.Provider value={{ data, updateData, currentStep, setCurrentStep, eventId }}>
       {children}
     </WizardContext.Provider>
   );

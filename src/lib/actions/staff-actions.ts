@@ -5,6 +5,8 @@ import User from "@/models/User";
 import Event from "@/models/Event";
 import { revalidatePath } from "next/cache";
 import { createNotification } from "./notification-actions";
+import { StaffOnboardingData } from "@/hooks/useStaffOnboarding";
+import { getSession } from "@/lib/auth";
 
 export async function getStaffApplications() {
   try {
@@ -122,6 +124,44 @@ export async function submitOnboarding(formData: FormData) {
   } catch (error: any) {
     console.error("Error submitting onboarding:", error);
     return { success: false, error: error.message || "Failed to submit onboarding" };
+  }
+}
+
+export async function completeStaffOnboarding(data: StaffOnboardingData) {
+  try {
+    const session = await getSession();
+    if (!session) return { success: false, message: "Not authenticated" };
+    
+    await dbConnect();
+    
+    const update = {
+      'staffProfile.bio': data.bio,
+      'staffProfile.skills': data.skills,
+      'staffProfile.yearsOfExperience': data.yearsOfExperience,
+      'staffProfile.noticePeriod': data.noticePeriod,
+      'staffProfile.customTags': data.customTags,
+      'staffProfile.availability': data.availability,
+      'staffProfile.profileImage': data.profileImage,
+      'staffProfile.onboardingStatus': 'pending',
+    };
+
+    const user = await User.findByIdAndUpdate(session.user.id, { $set: update }, { new: true });
+    if (!user) return { success: false, message: "User not found" };
+
+    // Notify Admin
+    const adminId = '69c29ad5886e033a0dbe4d1f'; 
+    await createNotification(adminId, {
+      title: 'New Staff Application',
+      message: `${user.name} has submitted their onboarding for review.`,
+      type: 'info',
+      link: '/admin/staff'
+    });
+
+    revalidatePath('/admin/staff/applications');
+    return { success: true, message: "Onboarding completed! Awaiting admin approval." };
+  } catch (error: any) {
+    console.error("Error completing onboarding:", error);
+    return { success: false, message: error.message || "Failed to complete onboarding" };
   }
 }
 

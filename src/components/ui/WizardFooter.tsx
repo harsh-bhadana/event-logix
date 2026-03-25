@@ -3,7 +3,7 @@
 import { useWizard } from "@/hooks/useEventWizard";
 import { twMerge } from "tailwind-merge";
 import { clsx, type ClassValue } from "clsx";
-import { publishEvent } from "@/lib/actions/event-actions";
+import { publishEvent, updateEvent } from "@/lib/actions/event-actions";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 
@@ -13,7 +13,7 @@ function cn(...inputs: ClassValue[]) {
 
 export function WizardFooter() {
   const router = useRouter();
-  const { data, currentStep, setCurrentStep } = useWizard();
+  const { data, currentStep, setCurrentStep, eventId } = useWizard();
   const [isPublishing, setIsPublishing] = useState(false);
 
   const validateStep = (step: number) => {
@@ -41,7 +41,10 @@ export function WizardFooter() {
     } else {
       setIsPublishing(true);
       try {
-        const result = await publishEvent(data);
+        const result = eventId 
+          ? await updateEvent(eventId, data)
+          : await publishEvent(data);
+          
         if (result.success) {
           router.push("/admin/events");
           router.refresh();
@@ -49,7 +52,7 @@ export function WizardFooter() {
           alert("Error: " + result.message);
         }
       } catch (error) {
-        console.error("Failed to publish event:", error);
+        console.error("Failed to process event:", error);
         alert("An unexpected error occurred.");
       } finally {
         setIsPublishing(false);
@@ -88,10 +91,10 @@ export function WizardFooter() {
             isPublishing && "opacity-70 cursor-not-allowed"
           )}
         >
-          {isPublishing ? "Publishing..." : currentStep === 4 ? "Publish Event" : "Next Step"}
+          {isPublishing ? "Processing..." : currentStep === 4 ? (eventId ? "Update Event" : "Publish Event") : "Next Step"}
           {!isPublishing && (
             <span className="material-symbols-outlined text-sm">
-              {currentStep === 4 ? "rocket_launch" : "arrow_forward"}
+              {currentStep === 4 ? (eventId ? "save" : "rocket_launch") : "arrow_forward"}
             </span>
           )}
         </button>

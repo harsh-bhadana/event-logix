@@ -62,6 +62,59 @@ export async function publishEvent(data: WizardData) {
   }
 }
 
+export async function updateEvent(id: string, data: WizardData) {
+  try {
+    await dbConnect();
+
+    const ticketTypes =
+      data.accessModel === "free"
+        ? [{ name: "General Admission", price: 0, quantity: parseInt(data.totalQuantity, 10) || 0 }]
+        : [{ name: "Standard", price: parseFloat(data.ticketPrice) || 0, quantity: parseInt(data.totalQuantity, 10) || 0 }];
+
+    const updateData = {
+      title: data.title,
+      description: data.description,
+      imageUrl: data.bannerImage ?? null,
+      category: data.category,
+      date: new Date(data.date),
+      accessModel: data.accessModel,
+      ticketTypes,
+      pricingStrategy: data.pricingStrategy,
+      taxInclusive: data.taxInclusive,
+      showFeeBreakdown: data.showFeeBreakdown,
+      staffRolesNeeded: data.staffRoles.map((role) => ({
+        roleName: role.name,
+        count: role.headcount,
+      })),
+    };
+
+    const updatedEvent = await Event.findByIdAndUpdate(
+      id,
+      { $set: updateData },
+      { new: true }
+    );
+
+    if (!updatedEvent) {
+      return { success: false, message: "Event not found" };
+    }
+
+    revalidatePath("/admin/events");
+    revalidatePath(`/admin/events/${id}`);
+    revalidatePath("/");
+
+    return {
+      success: true,
+      message: "Event updated successfully!",
+    };
+  } catch (error: any) {
+    console.error("Failed to update event:", error);
+    return {
+      success: false,
+      message: error.message || "Failed to update event.",
+    };
+  }
+}
+
 export async function getStaffOpportunities(filters?: { dateRange?: string; expertise?: string }) {
   try {
     await dbConnect();
