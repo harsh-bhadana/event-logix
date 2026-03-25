@@ -66,7 +66,7 @@ export default async function EventDetailsPage({
     : {
         title: "Global Leadership Summit 2024",
         description:
-          "The 2024 Global Leadership Summit brings together the world's most influential decision-makers, financial architects, and technological pioneers. This year's ledger focuses on 'Architecting the Next Decade,' exploring sustainable finance and human-centric leadership.",
+          "The 2024 Global Leadership Summit brings together the world&apos;s most influential decision-makers, financial architects, and technological pioneers. This year&apos;s ledger focuses on &apos;Architecting the Next Decade,&apos; exploring sustainable finance and human-centric leadership.",
         date: "October 14-16, 2024",
         // Set registration deadline 7 days from now for demo
         eventDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
