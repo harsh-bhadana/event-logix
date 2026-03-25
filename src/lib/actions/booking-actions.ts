@@ -76,7 +76,7 @@ export async function bookTicket(input: BookTicketInput) {
     });
 
     revalidatePath(`/events/${input.eventId}`);
-    revalidatePath("/admin/manage-events");
+    revalidatePath("/admin/events");
 
     return {
       success: true,
@@ -196,7 +196,7 @@ export async function applyForStaffRole(input: ApplyForRoleInput) {
     );
 
     revalidatePath("/staff/jobs");
-    revalidatePath("/admin/manage-events");
+    revalidatePath("/admin/events");
 
     return {
       success: true,
@@ -223,7 +223,7 @@ export async function updateEventStatus(
 
     await Event.findByIdAndUpdate(eventId, { status });
 
-    revalidatePath("/admin/manage-events");
+    revalidatePath("/admin/events");
     revalidatePath("/");
     revalidatePath(`/events/${eventId}`);
 
@@ -246,7 +246,7 @@ export async function toggleEventFeatured(eventId: string, isFeatured: boolean) 
 
     await Event.findByIdAndUpdate(eventId, { isFeatured });
 
-    revalidatePath("/admin/manage-events");
+    revalidatePath("/admin/events");
     revalidatePath("/");
 
     return { success: true, message: `Event ${isFeatured ? "featured" : "unfeatured"}.` };

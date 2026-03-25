@@ -45,7 +45,7 @@ export async function publishEvent(data: WizardData) {
     const newEvent = new Event(eventData);
     const savedEvent = await newEvent.save();
 
-    revalidatePath("/admin/manage-events");
+    revalidatePath("/admin/events");
     revalidatePath("/");
 
     return {
@@ -66,7 +66,7 @@ export async function getStaffOpportunities(filters?: { dateRange?: string; expe
   try {
     await dbConnect();
     
-    let query: any = { status: 'published' };
+    const query: any = { status: 'published' };
     
     const now = new Date();
     
@@ -88,8 +88,8 @@ export async function getStaffOpportunities(filters?: { dateRange?: string; expe
     
     // Filter events that have at least one open slot
     const opportunities = events.filter((event: any) => {
-      const openRoles = event.staffRolesNeeded.filter((role: any) => 
-        role.assignedStaff.length < role.count
+      const openRoles = (event.staffRolesNeeded || []).filter((role: any) => 
+        (role.assignedStaff?.length || 0) < role.count
       );
       
       if (openRoles.length === 0) return false;
@@ -123,7 +123,7 @@ export async function getAdminEvents(filters?: { search?: string; status?: strin
   try {
     await dbConnect();
     
-    let query: any = {};
+    const query: any = {};
     
     if (filters?.status && filters.status !== 'All Events') {
       const statusLower = filters.status.toLowerCase();
@@ -157,10 +157,10 @@ export async function getAdminEvents(filters?: { search?: string; status?: strin
         paymentStatus: 'completed'
       });
       
-      const totalTickets = event.ticketTypes.reduce((acc: number, type: any) => acc + (type.quantity || 0), 0);
+      const totalTickets = (event.ticketTypes || []).reduce((acc: number, type: any) => acc + (type.quantity || 0), 0);
       
-      const staffFilled = event.staffRolesNeeded.reduce((acc: number, role: any) => acc + (role.assignedStaff?.length || 0), 0);
-      const totalStaff = event.staffRolesNeeded.reduce((acc: number, role: any) => acc + (role.count || 0), 0);
+      const staffFilled = (event.staffRolesNeeded || []).reduce((acc: number, role: any) => acc + (role.assignedStaff?.length || 0), 0);
+      const totalStaff = (event.staffRolesNeeded || []).reduce((acc: number, role: any) => acc + (role.count || 0), 0);
 
       return {
         ...event,
@@ -205,7 +205,7 @@ export async function getFeaturedEvents() {
         event: event._id,
         paymentStatus: 'completed'
       });
-      const totalTickets = event.ticketTypes.reduce((acc: number, type: any) => acc + (type.quantity || 0), 0);
+      const totalTickets = (event.ticketTypes || []).reduce((acc: number, type: any) => acc + (type.quantity || 0), 0);
       
       return {
         ...event,
