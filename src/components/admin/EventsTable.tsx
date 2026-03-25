@@ -3,6 +3,7 @@
 import { format } from "date-fns";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useState, useRef, useEffect } from "react";
+import Link from "next/link";
 import { updateEventStatus, toggleEventFeatured } from "@/lib/actions/booking-actions";
 
 interface EventRow {
@@ -103,6 +104,20 @@ function ActionMenu({ event }: { event: EventRow }) {
             </span>
             {event.isFeatured ? "Remove from Featured" : "Mark as Featured"}
           </button>
+          <Link
+            href={`/admin/events/${event._id}/roster`}
+            className="w-full flex items-center gap-3 px-4 py-3 text-sm font-medium text-on-surface hover:bg-surface-container-low transition-colors"
+          >
+            <span className="material-symbols-outlined text-emerald-500 text-base">group</span>
+            View Roster
+          </Link>
+          <Link
+            href={`/admin/events/${event._id}/edit`}
+            className="w-full flex items-center gap-3 px-4 py-3 text-sm font-medium text-on-surface hover:bg-surface-container-low transition-colors"
+          >
+            <span className="material-symbols-outlined text-on-surface-variant text-base">edit</span>
+            Edit Details
+          </Link>
           <div className="border-t border-outline-variant/10" />
           {event.status !== "cancelled" && (
             <button
@@ -180,9 +195,11 @@ export function EventsTable({ events, total, page, pages }: EventsTableProps) {
                           />
                         </div>
                         <div>
-                          <p className="font-bold text-on-surface text-base group-hover:text-primary transition-colors">
-                            {event.title}
-                          </p>
+                      <Link href={`/admin/events/${event._id}/roster`} className="block">
+                        <p className="font-bold text-on-surface text-base group-hover:text-primary transition-colors">
+                          {event.title}
+                        </p>
+                      </Link>
                           <p className="text-sm text-on-surface-variant">
                             {format(new Date(event.date), "MMM d, yyyy")}
                           </p>

@@ -56,12 +56,12 @@ export function Hero() {
           </h1>
           
           <p className="text-lg text-on-surface-variant font-medium leading-relaxed mb-10 max-w-lg">
-            Join the world's most energetic community of event creators and thrill-seekers. From underground tech summits to exclusive gala dinners.
+            Join the world&apos;s most energetic community of event creators and thrill-seekers. From underground tech summits to exclusive gala dinners.
           </p>
           
           <div className="flex flex-col sm:flex-row items-center gap-5">
             <Link 
-              href="/discover" 
+              href="/events" 
               className="w-full sm:w-auto px-10 py-5 bg-primary text-on-primary rounded-2xl font-bold text-base shadow-2xl shadow-primary/20 hover:scale-105 transition-all active:scale-95 text-center group"
             >
               Explore Events

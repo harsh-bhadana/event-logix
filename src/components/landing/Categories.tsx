@@ -18,7 +18,7 @@ export function Categories() {
       <div className="flex items-center justify-between mb-12">
         <div>
           <h2 className="text-3xl font-black text-on-surface tracking-tight font-headline">Trending Categories</h2>
-          <p className="text-on-surface-variant font-medium mt-1">Explore what's happening right now</p>
+          <p className="text-on-surface-variant font-medium mt-1">Explore what&apos;s happening right now</p>
         </div>
         <button className="text-sm font-bold text-primary flex items-center gap-1 hover:gap-2 transition-all">
           View all categories

@@ -4,7 +4,7 @@ import React from "react";
 import Link from "next/link";
 
 const PRODUCT_LINKS = [
-  { label: "Discover Events", href: "/discover" },
+  { label: "Discover Events", href: "/events" },
   { label: "Host an Event", href: "/signup" },
   { label: "Pricing", href: "#" },
   { label: "For Teams", href: "#" },

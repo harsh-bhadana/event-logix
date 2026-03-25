@@ -9,9 +9,9 @@ export function AdminSidebar() {
 
   const navItems = [
     { label: "Dashboard", href: "/admin", icon: "dashboard", exact: true },
-    { label: "Events", href: "/admin/manage-events", icon: "calendar_today", exact: false },
+    { label: "Events", href: "/admin/events", icon: "calendar_today", exact: false },
     { label: "Staff Verification", href: "/admin/staff", icon: "verified_user", exact: false },
-    { label: "Gate Control", href: "/admin/events", icon: "qr_code_scanner", exact: false },
+    { label: "Gate Control", href: "/admin/gate", icon: "qr_code_scanner", exact: false },
     { label: "Finances", href: "#", icon: "payments", exact: false },
   ];
 
