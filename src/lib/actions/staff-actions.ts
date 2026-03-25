@@ -2,6 +2,7 @@
 
 import dbConnect from "@/lib/mongodb";
 import User from "@/models/User";
+import Event from "@/models/Event";
 import { revalidatePath } from "next/cache";
 import { createNotification } from "./notification-actions";
 
@@ -215,4 +216,42 @@ export async function verifyTicket(bookingIdOrQr: string) {
 
 function isValidObjectId(id: string) {
   return /^[0-9a-fA-F]{24}$/.test(id);
+}
+
+export async function getStaffSchedule(userId: string) {
+  try {
+    await dbConnect();
+    const user = await User.findById(userId).select('staffProfile.shifts').populate('staffProfile.shifts.eventId').lean();
+    if (!user) return { success: false, error: "User not found" };
+
+    return {
+      success: true,
+      data: JSON.parse(JSON.stringify(user.staffProfile.shifts))
+    };
+  } catch (error: any) {
+    console.error("Error fetching staff schedule:", error);
+    return { success: false, error: error.message || "Failed to fetch schedule" };
+  }
+}
+
+export async function getShiftDetails(userId: string, eventId: string) {
+  try {
+    await dbConnect();
+    const event = await Event.findById(eventId).lean();
+    if (!event) return { success: false, error: "Event not found" };
+
+    const user = await User.findById(userId).select('staffProfile.shifts').lean();
+    const shift = user.staffProfile?.shifts?.find((s: any) => s.eventId.toString() === eventId);
+
+    return {
+      success: true,
+      data: {
+        event: JSON.parse(JSON.stringify(event)),
+        shift: JSON.parse(JSON.stringify(shift))
+      }
+    };
+  } catch (error: any) {
+    console.error("Error fetching shift details:", error);
+    return { success: false, error: error.message || "Failed to fetch shift details" };
+  }
 }

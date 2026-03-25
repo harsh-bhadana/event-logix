@@ -77,7 +77,7 @@ export function AdminEventsClient({ initialData, insights }: AdminEventsClientPr
             />
           </div>
           <Link 
-            href="/admin/manage-events/new"
+            href="/admin/events/new"
             className="flex items-center gap-2 bg-gradient-to-r from-primary to-primary-dim text-on-primary px-6 py-3 rounded-xl font-bold text-sm shadow-[0_10px_20px_rgba(41,105,91,0.15)] active:scale-95 transition-all"
           >
             <span className="material-symbols-outlined text-lg">add_circle</span>

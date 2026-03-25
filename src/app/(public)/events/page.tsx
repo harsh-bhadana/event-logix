@@ -71,11 +71,11 @@ const CATEGORIES = [
 ];
 
 export const metadata = {
-  title: "Discover Events – The Guest Gallery",
+  title: "Events – The Guest Gallery",
   description: "Browse and discover curated events, workshops, concerts, and experiences near you.",
 };
 
-export default async function DiscoverPage() {
+export default async function EventsPage() {
   // Use the server action layer instead of direct DB access
   const result = await getAdminEvents({ status: "published" });
   const dbEvents = result.success ? result.data : [];

@@ -87,7 +87,7 @@ export default function DashboardClient({ bookings, user }: DashboardClientProps
               </div>
               <h3 className="font-bold text-xl dark:text-white">No upcoming events</h3>
               <p className="text-slate-500 mt-2">Ready for your next experience? Browse thousands of events.</p>
-              <a href="/discover" className="inline-block mt-6 px-8 py-3 bg-slate-900 dark:bg-emerald-600 text-white rounded-xl font-bold hover:opacity-90 transition-all">
+              <a href="/events" className="inline-block mt-6 px-8 py-3 bg-slate-900 dark:bg-emerald-600 text-white rounded-xl font-bold hover:opacity-90 transition-all">
                 Browse Events
               </a>
             </div>

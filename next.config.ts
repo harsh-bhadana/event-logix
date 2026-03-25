@@ -20,6 +20,20 @@ const nextConfig: NextConfig = {
   experimental: {
     viewTransition: true,
   },
+  async redirects() {
+    return [
+      {
+        source: '/discover',
+        destination: '/events',
+        permanent: true,
+      },
+      {
+        source: '/admin/manage-events',
+        destination: '/admin/events',
+        permanent: true,
+      },
+    ];
+  },
 };
 
 export default nextConfig;

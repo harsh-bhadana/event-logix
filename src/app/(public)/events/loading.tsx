@@ -1,7 +1,7 @@
-// Next.js automatically shows this while /discover/page.tsx is loading
+// Next.js automatically shows this while /events/page.tsx is loading
 import { CardSkeletonGrid } from "@/components/ui/Loader";
 
-export default function DiscoverLoading() {
+export default function EventsLoading() {
   return (
     <div className="max-w-[1440px] mx-auto px-6 md:px-10 pt-12 pb-24">
       {/* Search bar placeholder */}

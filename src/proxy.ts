@@ -19,7 +19,7 @@ export default async function middleware(req: NextRequest) {
   if (isPublicRoute && session) {
     const role = session.user.role;
     if (role === 'admin') {
-      return NextResponse.redirect(new URL("/admin/manage-events", req.nextUrl));
+      return NextResponse.redirect(new URL("/admin/events", req.nextUrl));
     } else if (role === 'staff') {
       return NextResponse.redirect(new URL("/staff/jobs", req.nextUrl));
     }

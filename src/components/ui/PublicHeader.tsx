@@ -14,7 +14,7 @@ interface PublicHeaderProps {
 }
 
 const navLinks = [
-  { label: "Discover", href: "/discover" },
+  { label: "Discover", href: "/events" },
   { label: "Galleries", href: "#" },
   { label: "Hosting", href: "#" },
   { label: "Help", href: "#" },
@@ -24,7 +24,7 @@ export function PublicHeader({ user }: PublicHeaderProps) {
   const [menuOpen, setMenuOpen] = useState(false);
   const dashboardLink =
     user?.role === "admin"
-      ? "/admin/manage-events"
+      ? "/admin/events"
       : user?.role === "staff"
       ? "/staff/jobs"
       : "/";
@@ -35,7 +35,7 @@ export function PublicHeader({ user }: PublicHeaderProps) {
         {/* Logo */}
         <div className="flex items-center gap-8">
           <Link
-            href="/discover"
+            href="/events"
             className="text-xl font-extrabold tracking-tight text-primary dark:text-[#afefdd] hover:opacity-80 transition-opacity font-headline"
           >
             The Guest Gallery

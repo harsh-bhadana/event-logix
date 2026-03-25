@@ -1,7 +1,7 @@
-// Next.js shows this while /admin/manage-events/page.tsx is loading
+// Next.js shows this while /admin/events/page.tsx is loading
 import { TableRowSkeleton } from "@/components/ui/Loader";
 
-export default function ManageEventsLoading() {
+export default function AdminEventsLoading() {
   return (
     <div className="px-10 py-10">
       {/* Page header skeleton */}

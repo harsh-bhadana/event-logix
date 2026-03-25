@@ -12,7 +12,7 @@ interface ManageEventsPageProps {
   }>;
 }
 
-export default async function ManageEventsPage({ searchParams }: ManageEventsPageProps) {
+export default async function AdminEventsPage({ searchParams }: ManageEventsPageProps) {
   const params = await searchParams;
 
   const filters = {

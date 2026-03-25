@@ -22,7 +22,7 @@ export default function LoginForm() {
       // Redirect based on role
       switch (result.role) {
         case 'admin':
-          router.push("/admin/manage-events");
+          router.push("/admin/events");
           break;
         case 'staff':
           router.push("/staff/jobs");
@@ -95,7 +95,7 @@ export default function LoginForm() {
       </button>
 
       <div className="pt-2 text-center text-[13px] font-medium text-on-surface-variant">
-        Don't have an account?{" "}
+        Don&apos;t have an account?{" "}
         <Link href="/signup" className="text-primary font-bold hover:text-primary-dim transition-colors">
           Create Account
         </Link>

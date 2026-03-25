@@ -27,10 +27,10 @@ export function FeaturedEvents({ events }: FeaturedEventsProps) {
     <section className="max-w-[1440px] mx-auto px-10">
       <div className="flex items-end justify-between mb-12">
         <div>
-          <h2 className="text-4xl font-black text-on-surface tracking-tight font-headline">Editor's Picks</h2>
-          <p className="text-on-surface-variant font-medium mt-2">Hand-picked experiences you can't miss</p>
+          <h2 className="text-4xl font-black text-on-surface tracking-tight font-headline">Editor&apos;s Picks</h2>
+          <p className="text-on-surface-variant font-medium mt-2">Hand-picked experiences you can&apos;t miss</p>
         </div>
-        <Link href="/discover" className="px-6 py-3 bg-surface-container-high rounded-xl text-sm font-bold text-on-surface hover:bg-surface-bright transition-all">
+        <Link href="/events" className="px-6 py-3 bg-surface-container-high rounded-xl text-sm font-bold text-on-surface hover:bg-surface-bright transition-all">
           Explore All
         </Link>
       </div>
