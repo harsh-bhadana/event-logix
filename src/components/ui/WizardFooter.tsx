@@ -5,12 +5,14 @@ import { twMerge } from "tailwind-merge";
 import { clsx, type ClassValue } from "clsx";
 import { publishEvent } from "@/lib/actions/event-actions";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 
 function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
 export function WizardFooter() {
+  const router = useRouter();
   const { data, currentStep, setCurrentStep } = useWizard();
   const [isPublishing, setIsPublishing] = useState(false);
 
@@ -41,8 +43,8 @@ export function WizardFooter() {
       try {
         const result = await publishEvent(data);
         if (result.success) {
-          alert("Success: " + result.message);
-          // Optionally redirect or reset
+          router.push("/admin/events");
+          router.refresh();
         } else {
           alert("Error: " + result.message);
         }
