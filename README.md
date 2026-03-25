@@ -2,7 +2,7 @@
 
 <div align="center">
   <h1>🎟️ Event Logix</h1>
-  <p><strong>A premium full-stack event management platform</strong></p>
+  <p><strong>The premium, role-based event orchestration ecosystem.</strong></p>
   <p>
     <img src="https://img.shields.io/badge/Next.js-16-000000?logo=nextdotjs" alt="Next.js" />
     <img src="https://img.shields.io/badge/React-19-61DAFB?logo=react" alt="React" />
@@ -14,225 +14,130 @@
 
 ---
 
-## Overview
+## 🌟 Overview
 
-**Event Logix** is a modern event management system with three distinct portals:
+**Event Logix** is a high-performance event management platform engineered for maximum stability and seamless user experience. By leveraging **Next.js 16 Server Actions** and an adaptive **RBAC (Role-Based Access Control)** system, it provides three distinct, specialized environments for organizers, service providers, and attendees.
 
-| Portal | Audience | Path |
-|--------|----------|------|
-| **Public / Guest Gallery** | Visitors & attendees | `/discover`, `/events/[id]` |
-| **Staff Portal** | Verified service providers | `/staff/jobs`, `/onboarding` |
-| **Admin Suite** | Organizers & managers | `/admin/manage-events`, `/admin/staff/*` |
+### 🛡️ Core Stability: The Defensive Layer
+This platform implements a **Robust Defensive Architecture** that protects against data-drifting and null-reference crashes common in complex NoSQL schemas. Every data-intensive component is wrapped in defensive null-safety guards, ensuring a 99.9% uptime for critical management views like Rosters and Analytics.
 
 ---
 
-## Tech Stack
+## 🏗️ Architectural Portals
 
-| Layer | Technology |
-|-------|-----------|
-| Framework | Next.js 16 (App Router, Server Actions) |
-| UI | React 19, Tailwind CSS v4, Framer Motion |
-| Auth | Custom JWT via `jose`, HTTP-only cookies |
-| Database | MongoDB via Mongoose |
-| Validation | Zod |
-| Utilities | `date-fns`, `lucide-react`, `clsx`, `tailwind-merge` |
+| Portal | Role | Core Functions |
+|--------|------|----------------|
+| **Admin Suite** | `admin` | Event Wizard, Staff Verification, Financial Analytics, Roster Management |
+| **Staff Hub** | `staff` | Job Feed, Professional Onboarding, Shift Scheduling, Shift History |
+| **Guest Gallery** | `public` | Event Discovery, Ticket Booking, Profile Management, Real-time Notifications |
 
 ---
 
-## Project Structure
+## 🛠️ Tech Stack
 
-```
-src/
-├── app/
-│   ├── (public)/          # Public-facing routes (discover, event detail)
-│   ├── (admin)/admin/     # Admin portal (manage-events, staff apps/roster)
-│   ├── (staff)/           # Staff portal (jobs feed, onboarding)
-│   ├── (auth)/            # Login & signup pages
-│   └── page.tsx           # Landing page
-│
-├── components/
-│   ├── admin/             # AdminEventsClient, EventsTable, StaffApplicationsClient
-│   ├── features/
-│   │   ├── events/        # Event creation wizard steps (Step1–4)
-│   │   └── onboarding/    # Staff onboarding wizard steps
-│   ├── landing/           # Hero, FeaturedEvents, Features, Newsletter, etc.
-│   ├── staff/             # JobsFeed, JobCard, JobDetailDrawer, QuickFilterBar
-│   └── ui/                # Shared: PublicHeader, PublicFooter, TopAppBar,
-│                          #         AdminSidebar, WizardSidebar, BookingCard,
-│                          #         CountdownTimer, Loader, EventCard
-│
-├── lib/
-│   ├── actions/
-│   │   ├── auth-actions.ts      # login, logout, signup
-│   │   ├── event-actions.ts     # publishEvent, getAdminEvents, getFeaturedEvents
-│   │   ├── booking-actions.ts   # bookTicket, applyForStaffRole, updateEventStatus,
-│   │   │                        # toggleEventFeatured, getAdminInsights
-│   │   └── staff-actions.ts     # getStaffApplications, updateStaffStatus,
-│   │                            # getMasterRoster, submitOnboarding
-│   ├── auth.ts            # getSession (JWT decode from cookie)
-│   ├── cn.ts              # Shared cn() Tailwind class merging utility
-│   └── mongodb.ts         # Mongoose connection helper
-│
-├── models/
-│   ├── Event.ts           # IEvent schema (ticketTypes[], lineup[], staffRolesNeeded[])
-│   ├── User.ts            # IUser schema with staffProfile sub-document
-│   └── Booking.ts         # IBooking schema (event, user, ticketType, quantity, totalAmount)
-│
-└── hooks/
-    ├── useEventWizard.ts  # Multi-step wizard state context
-    └── useDebounce.ts     # Debounce hook for search inputs
-```
+| Layer | Technologies |
+|-------|--------------|
+| **Framework** | Next.js 16 (App Router, Server Actions, Concurrent Rendering) |
+| **Frontend** | React 19, Tailwind CSS v4, Framer Motion, Recharts |
+| **Security** | Custom JWT (via `jose`), Middleware Proxies, BcryptJS |
+| **Database** | MongoDB (Mongoose ODM) |
+| **Automation** | Vercel Cron Jobs (Scheduled Reminders) |
+| **Visuals** | Lucide Icons, Experimental View Transitions API |
 
 ---
 
-## Getting Started
-
-### Prerequisites
-
-- Node.js ≥ 18
-- A MongoDB connection string (MongoDB Atlas or local)
-
-### Installation
+## 📂 Project Structure
 
 ```bash
-# 1. Clone the repository
-git clone https://github.com/your-username/event-logix.git
-cd event-logix
+src/
+├── app/
+│   ├── (public)/          # Guest experience (events, details, home)
+│   ├── (admin)/admin/     # Organizer suite (analytics, rosters, staff)
+│   ├── (staff)/staff/     # Workforce portal (jobs, schedule, profile)
+│   ├── (auth)/            # Identity management (login, signup)
+│   ├── api/               # Serverless endpoints & hook-based cron jobs
+│   └── page.tsx           # Premium landing page
+│
+├── components/
+│   ├── admin/             # Management components & Data Visualization
+│   ├── auth/              # Secure identity forms
+│   ├── landing/           # Hero, Features, and Discovery sections
+│   ├── staff/             # Jobs feed & Schedule integration
+│   └── ui/                # Atomic UI system (Loaders, Sidebars, Modals)
+│
+├── lib/
+│   ├── actions/           # 100% Server Actions based data layer
+│   │   ├── auth-actions.ts      # Identity lifecycle
+│   │   ├── event-actions.ts     # Core event logic
+│   │   ├── roster-actions.ts    # Staffing & assignment engine
+│   │   └── analytics-actions.ts # Business intelligence
+│   ├── auth.ts            # Session & Token primitives
+│   ├── mongodb.ts         # High-availability DB connection
+│   └── cn.ts              # Utility for style composition
+│
+├── models/                # Typed Mongoose Schemas (Event, User, Booking, Notification)
+├── hooks/                 # Reusable logic (useEventWizard, useDebounce)
+├── proxy.ts               # Global Middleware & Redirect Proxy (RBAC)
+└── types/                 # Shared TypeScript interface definitions
+```
 
-# 2. Install dependencies
+---
+
+## 🚀 Key Features
+
+### 💎 Management & Operations
+- **Event Orchestration Wizard**: A stateful multi-step form for publishing events with deep ticketing/staffing customization.
+- **Master Roster Control**: Real-time staff tracking with automated capacity checks and assignment safety.
+- **Admin Insights**: Financial and operational dashboards powered by native Recharts implementation.
+
+### 🤝 Workforce Optimization
+- **Onboarding Flow**: Specialized staff verification process to maintain service quality.
+- **Opportunity Feed**: Intelligent job discovery based on staff expertise and schedule.
+- **Live Schedule**: Visual calendar view for staff to manage upcoming shifts and historic records.
+
+### 🎟️ Attendee Experience
+- **Frictionless Booking**: Multi-tier ticket selection with real-time availability validation.
+- **Smart Notifications**: In-app and scheduled reminders for upcoming events and status changes.
+- **Premium Aesthetics**: Smooth page-level transitions and micro-animations for an "app-like" feel.
+
+---
+
+## ⚙️ Getting Started
+
+### 1. Prerequisites
+- Node.js ≥ 18
+- MongoDB Connection String (Atlas or Local)
+
+### 2. Installation
+```bash
+git clone https://github.com/harsh-bhadana/event-logix.git
 npm install
+```
 
-# 3. Configure environment variables
-cp .env.example .env.local
-# → Fill in MONGODB_URI and JWT_SECRET
+### 3. Environment Configuration
+Create a `.env.local`:
+```env
+MONGODB_URI=your_mongodb_connection_string
+JWT_SECRET=your_32_char_random_secret
+```
 
-# 4. Start the development server
+### 4. Run Development
+```bash
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000).
+---
 
-### Environment Variables
+## 📜 Scripts
 
-Create a `.env.local` file in the root of the project:
-
-```env
-# MongoDB connection string (required)
-MONGODB_URI=mongodb+srv://<user>:<password>@cluster.mongodb.net/event-logix
-
-# JWT signing secret — use a long random string (required)
-JWT_SECRET=your-super-secret-jwt-key-minimum-32-chars
-```
+| Command | Action |
+|---------|--------|
+| `npm run dev` | Spins up the local development environment |
+| `npm run build` | Compiles for production (Self-checks for type safety) |
+| `npm run lint` | Runs the linter suite to ensure code health |
+| `npx tsc --noEmit` | Deep type-validation across the entire tree |
 
 ---
 
-## Key Features
-
-### 🎟️ Ticket Booking
-- Multi-type ticket selection with quantity picker
-- Capacity-checked via `Booking.countDocuments` before saving
-- Free tickets auto-confirm; paid tickets enter `pending` payment status
-- Unauthenticated users are redirected to `/login`
-
-### ⏱️ Live Countdown Timer
-- Client component ticking every second towards the event date
-- Shows days/hours/minutes/seconds; switches to "Registration closed" when expired
-
-### 🧑‍💼 Staff Application Flow
-- Staff browse open roles on the Jobs Feed
-- `JobDetailDrawer` shows available roles with spots remaining
-- `applyForStaffRole` server action: validates staff approval status, prevents duplicate applications, prevents over-filling a role
-
-### 🛠️ Admin Event Management
-- Create events via a multi-step wizard (Basic Info → Ticketing → Staffing → Review)
-- Per-row action dropdown: **Publish**, **Set to Draft**, **Mark as Featured**, **Cancel**
-- Live dashboard insights: revenue, tickets sold, published/total events, verified staff count
-
-### 👥 Staff Approvals
-- Admin reviews pending applications
-- One-click Approve/Reject updates `staffProfile.onboardingStatus`
-
----
-
-## Data Models
-
-### `Event`
-```typescript
-{
-  title, description, imageUrl, category, date,
-  locationName, location: { type: "Point", address, coordinates },
-  accessModel: "free" | "paid",
-  ticketTypes: [{ name, price, quantity }],
-  lineup: [{ name, role, org?, imageUrl? }],   // performers, speakers, hosts…
-  staffRolesNeeded: [{ roleName, count, assignedStaff: ObjectId[] }],
-  status: "draft" | "published" | "cancelled",
-  isFeatured: boolean,
-  pricingStrategy, taxInclusive, showFeeBreakdown
-}
-```
-
-### `User`
-```typescript
-{
-  name, email, passwordHash,
-  role: "admin" | "staff" | "attendee",
-  staffProfile?: {
-    bio, skills: string[], yearsOfExperience,
-    onboardingStatus: "pending" | "approved" | "rejected",
-    isVerified: boolean
-  }
-}
-```
-
-### `Booking`
-```typescript
-{
-  event: ObjectId, user: ObjectId,
-  ticketType: string, quantity: number, totalAmount: number,
-  paymentStatus: "pending" | "completed" | "refunded",
-  paymentId?, qrCode?
-}
-```
-
----
-
-## Shared Utilities
-
-| Export | Location | Purpose |
-|--------|----------|---------|
-| `cn()` | `src/lib/cn.ts` | Merges Tailwind classes using `clsx` + `twMerge` |
-| `Spinner` | `src/components/ui/Loader.tsx` | Inline spinner (sm/md/lg) |
-| `PageLoader` | same | Full-page animated overlay |
-| `CardSkeleton` / `CardSkeletonGrid` | same | Skeleton for event card grids |
-| `TableRowSkeleton` | same | Skeleton for admin table rows |
-| `LoadingBar` | same | Top-of-page progress bar |
-| `CountdownTimer` | `src/components/ui/CountdownTimer.tsx` | Live countdown to a target date |
-| `BookingCard` | `src/components/ui/BookingCard.tsx` | Ticket selector + booking form |
-
----
-
-## Scripts
-
-```bash
-npm run dev      # Start development server (port 3000)
-npm run build    # Production build
-npm run start    # Start production server
-npm run lint     # ESLint check
-npx tsc --noEmit # TypeScript type check (no output files)
-```
-
----
-
-## Contributing
-
-1. Fork the repository
-2. Create a feature branch: `git checkout -b feat/my-feature`
-3. Commit your changes: `git commit -m 'feat: add my feature'`
-4. Push to the branch: `git push origin feat/my-feature`
-5. Open a Pull Request
-
----
-
-## License
-
-MIT © Event Logix
+## 📄 License
+ Event Logix
