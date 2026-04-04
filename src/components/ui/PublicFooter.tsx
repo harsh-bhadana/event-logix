@@ -55,7 +55,7 @@ const SOCIAL_LINKS = [
 
 export function PublicFooter() {
   return (
-    <footer className="bg-surface-container-low dark:bg-neutral-950 w-full border-t border-outline-variant/10 mt-auto">
+    <footer className="bg-surface-container-low w-full border-t border-outline-variant/10 mt-auto transition-colors duration-300">
       <div className="max-w-[1440px] mx-auto px-6 md:px-10 py-16">
         {/* Top section */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-12 pb-12 border-b border-outline-variant/10">
@@ -64,7 +64,7 @@ export function PublicFooter() {
             <span className="font-headline font-black text-primary text-xl block">
               The Guest Gallery
             </span>
-            <p className="font-body text-sm text-on-surface-variant dark:text-neutral-400 leading-relaxed max-w-xs">
+            <p className="font-body text-sm text-on-surface-variant leading-relaxed max-w-xs">
               Connecting curious minds with unforgettable experiences and professional gatherings.
             </p>
             {/* Social icons */}
@@ -146,7 +146,7 @@ export function PublicFooter() {
 
         {/* Bottom bar */}
         <div className="pt-8 flex flex-col sm:flex-row justify-between items-center gap-4">
-          <p className="font-body text-xs text-on-surface-variant dark:text-neutral-500">
+          <p className="font-body text-xs text-on-surface-variant">
             © 2026 The Guest Gallery. An Event Logix Production.
           </p>
           <nav className="flex flex-wrap justify-center gap-x-6 gap-y-2">
