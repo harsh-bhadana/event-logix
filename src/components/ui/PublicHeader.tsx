@@ -4,6 +4,8 @@ import React, { useState } from "react";
 import Link from "next/link";
 import { logout } from "@/lib/actions/auth-actions";
 import { NotificationDropdown } from "./NotificationDropdown";
+import { ThemeToggle } from "./ThemeToggle";
+import { cn } from "@/lib/cn";
 
 interface PublicHeaderProps {
   user?: {
@@ -30,23 +32,26 @@ export function PublicHeader({ user }: PublicHeaderProps) {
       : "/";
 
   return (
-    <header className="bg-[#fbf9f7] dark:bg-neutral-900 sticky top-0 z-50 border-b border-outline-variant/10">
+    <header className="bg-surface sticky top-0 z-50 border-b border-outline-variant/10 backdrop-blur-md bg-opacity-80 transition-colors duration-300">
       <div className="flex justify-between items-center w-full px-6 md:px-10 py-4 max-w-[1440px] mx-auto">
         {/* Logo */}
         <div className="flex items-center gap-8">
           <Link
             href="/events"
-            className="text-xl font-extrabold tracking-tight text-primary dark:text-[#afefdd] hover:opacity-80 transition-opacity font-headline"
+            className="text-xl font-extrabold tracking-tight text-primary hover:opacity-80 transition-opacity font-headline"
           >
             The Guest Gallery
           </Link>
           {/* Desktop nav */}
           <nav className="hidden md:flex items-center gap-6">
-            {navLinks.map((link) => (
+            {navLinks.map((link, idx) => (
               <Link
                 key={link.label}
                 href={link.href}
-                className="text-on-surface-variant dark:text-neutral-400 font-medium hover:text-primary transition-colors duration-200 first:text-primary first:font-bold first:border-b-2 first:border-primary first:pb-1"
+                className={cn(
+                  "text-on-surface-variant font-medium hover:text-primary transition-colors duration-200",
+                  idx === 0 && "text-primary font-bold border-b-2 border-primary pb-1"
+                )}
               >
                 {link.label}
               </Link>
@@ -56,6 +61,8 @@ export function PublicHeader({ user }: PublicHeaderProps) {
 
         {/* Desktop CTA */}
         <div className="hidden md:flex items-center gap-4">
+          <ThemeToggle />
+          <div className="h-6 w-[1px] bg-outline-variant/20 mx-2" />
           {user ? (
             <>
               <NotificationDropdown userId={user.id} />
@@ -93,15 +100,18 @@ export function PublicHeader({ user }: PublicHeaderProps) {
         </div>
 
         {/* Mobile hamburger */}
-        <button
-          className="md:hidden p-2 rounded-lg hover:bg-surface-container-low transition-colors"
-          onClick={() => setMenuOpen((o) => !o)}
-          aria-label="Toggle menu"
-        >
-          <span className="material-symbols-outlined text-on-surface">
-            {menuOpen ? "close" : "menu"}
-          </span>
-        </button>
+        <div className="flex items-center gap-3 md:hidden">
+          <ThemeToggle />
+          <button
+            className="p-2 rounded-lg hover:bg-surface-container-low transition-colors"
+            onClick={() => setMenuOpen((o) => !o)}
+            aria-label="Toggle menu"
+          >
+            <span className="material-symbols-outlined text-on-surface">
+              {menuOpen ? "close" : "menu"}
+            </span>
+          </button>
+        </div>
       </div>
 
       {/* Mobile dropdown menu */}

@@ -94,7 +94,12 @@ export default async function EventDetailsPage({
       {/* Hero Banner */}
       <section className="relative h-[614px] min-h-[450px] w-full overflow-hidden">
         <div className="absolute inset-0">
-          <img alt="Event Hero" className="w-full h-full object-cover" src={data.imageUrl} />
+          <img 
+            alt="Event Hero" 
+            className="w-full h-full object-cover" 
+            src={data.imageUrl} 
+            style={{ viewTransitionName: `event-image-${id}` } as React.CSSProperties}
+          />
           <div className="absolute inset-0 bg-gradient-to-t from-neutral-900/90 via-neutral-900/40 to-transparent" />
         </div>
         <div className="relative h-full max-w-[1440px] mx-auto px-10 flex flex-col justify-end pb-16">
@@ -102,7 +107,10 @@ export default async function EventDetailsPage({
             <span className="inline-block bg-tertiary-container text-on-tertiary-container px-3 py-1 rounded-sm text-xs font-bold tracking-widest uppercase">
               Annual Flagship Event
             </span>
-            <h1 className="text-5xl md:text-7xl font-headline font-extrabold text-white tracking-tight leading-tight uppercase">
+            <h1 
+              className="text-5xl md:text-7xl font-headline font-extrabold text-white tracking-tight leading-tight uppercase"
+              style={{ viewTransitionName: `event-title-${id}` } as React.CSSProperties}
+            >
               {data.title}
             </h1>
             <div className="flex flex-wrap items-center gap-6 text-white/90 font-medium font-headline">

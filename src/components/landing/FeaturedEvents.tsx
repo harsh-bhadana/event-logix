@@ -57,6 +57,8 @@ export function FeaturedEvents({ events }: FeaturedEventsProps) {
                     fill 
                     className="object-cover group-hover:scale-110 transition-transform duration-700" 
                     alt={event.title}
+                    priority={i === 0}
+                    style={{ viewTransitionName: `event-image-${event._id}` } as React.CSSProperties}
                   />
                   
                   {/* Urgency Badge */}
@@ -80,7 +82,12 @@ export function FeaturedEvents({ events }: FeaturedEventsProps) {
                     <span className="material-symbols-outlined text-sm">calendar_today</span>
                     {format(new Date(event.date), 'MMMM d, yyyy')}
                   </div>
-                  <h3 className="text-xl font-black text-on-surface group-hover:text-primary transition-colors leading-tight mb-2 font-headline">{event.title}</h3>
+                  <h3 
+                    className="text-xl font-black text-on-surface group-hover:text-primary transition-colors leading-tight mb-2 font-headline"
+                    style={{ viewTransitionName: `event-title-${event._id}` } as React.CSSProperties}
+                  >
+                    {event.title}
+                  </h3>
                   <div className="flex items-center gap-2 text-on-surface-variant text-sm font-medium">
                     <span className="material-symbols-outlined text-base">location_on</span>
                     {event.locationName}
