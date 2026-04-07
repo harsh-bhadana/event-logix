@@ -60,7 +60,7 @@ interface SkeletonProps {
   className?: string;
 }
 
-function Bone({ className }: SkeletonProps) {
+export function Bone({ className }: SkeletonProps) {
   return (
     <div
       className={cn(
@@ -93,6 +93,61 @@ export function CardSkeletonGrid({ count = 6 }: { count?: number }) {
       {Array.from({ length: count }).map((_, i) => (
         <CardSkeleton key={i} />
       ))}
+    </div>
+  );
+}
+
+// ─── Event Details skeleton ──────────────────────────────────────────────────
+
+export function EventDetailsSkeleton() {
+  return (
+    <div className="bg-surface animate-in fade-in duration-500">
+      {/* Hero Banner Skeleton */}
+      <section className="relative h-[614px] min-h-[450px] w-full bg-surface-container overflow-hidden">
+        <div className="relative h-full max-w-[1440px] mx-auto px-10 flex flex-col justify-end pb-16">
+          <div className="max-w-3xl space-y-6">
+            <Bone className="h-6 w-32" />
+            <Bone className="h-20 w-full md:w-3/4" />
+            <div className="flex gap-6">
+              <Bone className="h-6 w-48" />
+              <Bone className="h-6 w-48" />
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Main Content Skeleton */}
+      <div className="max-w-[1440px] mx-auto px-10 py-20 flex flex-col lg:flex-row gap-16">
+        <div className="flex-1 space-y-16">
+          <section className="space-y-6">
+            <Bone className="h-10 w-48" />
+            <div className="space-y-3">
+              <Bone className="h-4 w-full" />
+              <Bone className="h-4 w-full" />
+              <Bone className="h-4 w-3/4" />
+            </div>
+          </section>
+          <section className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <Bone className="h-40 rounded-2xl" />
+            <Bone className="h-40 rounded-2xl" />
+          </section>
+          <section className="space-y-8">
+            <Bone className="h-10 w-48" />
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-8">
+              {Array.from({ length: 3 }).map((_, i) => (
+                <div key={i} className="space-y-4">
+                  <Bone className="aspect-square rounded-xl" />
+                  <Bone className="h-6 w-32" />
+                  <Bone className="h-4 w-24" />
+                </div>
+              ))}
+            </div>
+          </section>
+        </div>
+        <div className="lg:w-[420px]">
+          <Bone className="h-[500px] rounded-2xl sticky top-28" />
+        </div>
+      </div>
     </div>
   );
 }

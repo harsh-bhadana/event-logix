@@ -19,6 +19,7 @@ export function EventCard({ id, title, price, date, location, imageUrl, tag }: E
           alt={title} 
           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" 
           src={imageUrl} 
+          style={{ viewTransitionName: `event-image-${id}` } as React.CSSProperties}
         />
         <div className="absolute top-4 left-4 bg-surface-container-lowest/90 backdrop-blur-md px-3 py-1 rounded-lg text-primary-dim font-bold text-sm shadow-sm">
           {price === 0 ? "Free" : `$${price}`}
@@ -29,7 +30,12 @@ export function EventCard({ id, title, price, date, location, imageUrl, tag }: E
       </div>
       <div className="space-y-1 px-1">
         <div className="flex justify-between items-start">
-          <h3 className="text-lg font-bold font-headline text-on-surface">{title}</h3>
+          <h3 
+            className="text-lg font-bold font-headline text-on-surface"
+            style={{ viewTransitionName: `event-title-${id}` } as React.CSSProperties}
+          >
+            {title}
+          </h3>
           {tag && (
             <span className="text-xs font-bold bg-tertiary-container text-on-tertiary-container px-2 py-0.5 rounded uppercase tracking-wider">
               {tag}
