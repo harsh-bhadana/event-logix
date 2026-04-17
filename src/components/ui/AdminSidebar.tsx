@@ -3,22 +3,10 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { logout } from "@/lib/actions/auth-actions";
+import { ADMIN_NAV_ITEMS, ADMIN_BOTTOM_ITEMS } from "@/lib/nav-constants";
 
 export function AdminSidebar() {
   const pathname = usePathname();
-
-  const navItems = [
-    { label: "Dashboard", href: "/admin", icon: "dashboard", exact: true },
-    { label: "Events", href: "/admin/events", icon: "calendar_today", exact: false },
-    { label: "Staff Verification", href: "/admin/staff", icon: "verified_user", exact: false },
-    { label: "Gate Control", href: "/admin/gate", icon: "qr_code_scanner", exact: false },
-    { label: "Finances", href: "#", icon: "payments", exact: false },
-  ];
-
-  const bottomItems = [
-    { label: "Support", href: "#", icon: "headset_mic" },
-    { label: "Archive", href: "#", icon: "inventory_2" },
-  ];
 
   const isActive = (href: string, exact: boolean) => {
     if (href === "#") return false;
@@ -40,8 +28,8 @@ export function AdminSidebar() {
       </div>
 
       <nav className="flex-1 space-y-1">
-        {navItems.map((item) => {
-          const active = isActive(item.href, item.exact);
+        {ADMIN_NAV_ITEMS.map((item) => {
+          const active = isActive(item.href, !!item.exact);
           return (
             <Link
               key={item.label}
@@ -65,7 +53,7 @@ export function AdminSidebar() {
       </nav>
 
       <div className="mt-auto space-y-1">
-        {bottomItems.map((item) => (
+        {ADMIN_BOTTOM_ITEMS.map((item) => (
           <Link
             key={item.label}
             href={item.href}
