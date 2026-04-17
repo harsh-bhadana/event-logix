@@ -5,7 +5,16 @@ import Booking from "@/models/Booking";
 import Event from "@/models/Event";
 import { startOfDay, endOfDay, subDays, format, startOfMonth, endOfMonth } from "date-fns";
 
-export async function getFinancialSummary() {
+export interface FinancialSummary {
+  totalRevenue: number;
+  totalSales: number;
+  averageOrderValue: number;
+  refundCount: number;
+  refundAmount: number;
+  pendingSettlement: number;
+}
+
+export async function getFinancialSummary(): Promise<{ success: boolean; data?: FinancialSummary; error?: string }> {
   try {
     await dbConnect();
 
@@ -21,6 +30,9 @@ export async function getFinancialSummary() {
     const refundCount = refundedBookings.length;
     const refundAmount = refundedBookings.reduce((acc: number, curr: any) => acc + (curr.totalAmount || 0), 0);
 
+    // Calculate pending settlement (e.g. 80% of total revenue is available for payout)
+    const pendingSettlement = totalRevenue * 0.8;
+
     return {
       success: true,
       data: {
@@ -29,6 +41,7 @@ export async function getFinancialSummary() {
         averageOrderValue,
         refundCount,
         refundAmount,
+        pendingSettlement,
       }
     };
   } catch (error: any) {
@@ -37,7 +50,12 @@ export async function getFinancialSummary() {
   }
 }
 
-export async function getRevenueTrends(days = 30) {
+export interface RevenueTrend {
+  date: string;
+  revenue: number;
+}
+
+export async function getRevenueTrends(days = 30): Promise<{ success: boolean; data?: RevenueTrend[]; error?: string }> {
   try {
     await dbConnect();
     const startDate = subDays(new Date(), days);
@@ -82,6 +100,7 @@ export async function getRecentTransactions(limit = 10) {
   try {
     await dbConnect();
 
+    const total = await Booking.countDocuments({});
     const transactions = await Booking.find({})
       .populate("event", "title")
       .sort({ createdAt: -1 })
@@ -90,7 +109,8 @@ export async function getRecentTransactions(limit = 10) {
 
     return {
       success: true,
-      data: JSON.parse(JSON.stringify(transactions))
+      data: JSON.parse(JSON.stringify(transactions)),
+      total
     };
   } catch (error: any) {
     console.error("Error fetching recent transactions:", error);

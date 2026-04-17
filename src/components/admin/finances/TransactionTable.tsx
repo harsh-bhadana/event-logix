@@ -5,9 +5,10 @@ import { format } from "date-fns";
 
 interface TransactionTableProps {
   transactions: any[];
+  total: number;
 }
 
-export function TransactionTable({ transactions }: TransactionTableProps) {
+export function TransactionTable({ transactions, total }: TransactionTableProps) {
   const getStatusStyles = (status: string) => {
     switch (status) {
       case 'completed':
@@ -94,7 +95,7 @@ export function TransactionTable({ transactions }: TransactionTableProps) {
       
       <div className="p-8 bg-surface-container-low/20 flex items-center justify-between border-t border-outline-variant/10">
         <p className="text-xs font-medium text-on-surface-variant">
-          Showing <span className="text-on-surface font-bold">10</span> of <span className="text-on-surface font-bold">40</span> records
+          Showing <span className="text-on-surface font-bold">{transactions.length}</span> of <span className="text-on-surface font-bold">{total}</span> records
         </p>
         <div className="flex gap-2">
           <button className="px-4 py-2 rounded-xl bg-surface-container-high text-[10px] font-bold uppercase tracking-widest text-on-surface-variant hover:bg-surface-container-highest transition-all opacity-50 cursor-not-allowed">Previous</button>

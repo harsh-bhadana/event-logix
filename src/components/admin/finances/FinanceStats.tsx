@@ -1,15 +1,10 @@
 "use client";
 
 import { motion } from "framer-motion";
+import { FinancialSummary } from "@/lib/actions/finance-actions";
 
 interface FinanceStatsProps {
-  summary: {
-    totalRevenue: number;
-    totalSales: number;
-    averageOrderValue: number;
-    refundCount: number;
-    refundAmount: number;
-  };
+  summary: FinancialSummary;
 }
 
 export function FinanceStats({ summary }: FinanceStatsProps) {

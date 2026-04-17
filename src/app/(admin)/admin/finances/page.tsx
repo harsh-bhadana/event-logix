@@ -66,12 +66,12 @@ export default async function FinancePage() {
       </div>
 
       {/* Primary Metrics Layer */}
-      <FinanceStats summary={summaryRes.data} />
+      <FinanceStats summary={summaryRes.data!} />
 
       {/* Analytics & History Grid */}
       <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
         <div className="xl:col-span-2">
-          <RevenueChart data={trendsRes.data} />
+          <RevenueChart data={trendsRes.data!} />
         </div>
         <div className="bg-surface-container-low/40 rounded-[2.5rem] p-8 border border-outline-variant/10 flex flex-col items-center justify-center text-center space-y-4">
           <div className="w-20 h-20 rounded-full bg-tertiary/10 flex items-center justify-center text-tertiary mb-2">
@@ -82,7 +82,7 @@ export default async function FinancePage() {
             Funds queued for direct deposit into your verified account. Next batch in 48 hours.
           </p>
           <div className="text-3xl font-black text-on-surface font-headline tracking-tighter">
-            $4,280.00
+            ${summaryRes.data!.pendingSettlement.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
           </div>
           <button className="w-full py-4 rounded-2xl bg-tertiary text-on-tertiary font-bold text-sm shadow-xl shadow-tertiary/10 hover:opacity-90 transition-all">
             Expedite Payout
@@ -91,7 +91,7 @@ export default async function FinancePage() {
       </div>
 
       {/* Detailed Ledger Section */}
-      <TransactionTable transactions={txRes.data} />
+      <TransactionTable transactions={txRes.data!} total={txRes.total!} />
     </div>
   );
 }
