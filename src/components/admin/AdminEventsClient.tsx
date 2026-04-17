@@ -42,7 +42,7 @@ export function AdminEventsClient({ initialData, insights }: AdminEventsClientPr
     });
     // Reset to page 1 on filter change
     if (!newParams.page) params.set('page', '1');
-    router.push(`?${params.toString()}`);
+    router.push(`?${params.toString()}`, { scroll: false });
   };
 
   // Handle search with debounce
@@ -58,12 +58,12 @@ export function AdminEventsClient({ initialData, insights }: AdminEventsClientPr
   const tabs = ['All Events', 'Draft', 'Published', 'Completed', 'Cancelled'];
 
   return (
-    <div className="px-10 py-10 animate-in fade-in slide-in-from-bottom-4 duration-700">
+    <div className="px-6 md:px-10 py-10">
       {/* Page Header */}
-      <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6 mb-12">
-        <div>
-          <h1 className="text-4xl font-extrabold tracking-tighter text-on-surface font-headline">Event Management</h1>
-          <p className="mt-2 text-on-surface-variant font-medium font-body">{initialData.total} Total Events in your active ledger</p>
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-12">
+        <div className="animate-in fade-in slide-in-from-left-4 duration-700">
+          <h1 className="text-3xl md:text-4xl font-black tracking-tighter text-on-surface font-headline">Event Management</h1>
+          <p className="mt-2 text-on-surface-variant font-medium font-body opacity-80">{initialData.total} Total Events in your active ledger</p>
         </div>
         <div className="flex flex-wrap items-center gap-4">
           <div className="relative w-full sm:w-80 group">
