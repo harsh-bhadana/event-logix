@@ -2,7 +2,6 @@ import React from 'react';
 import { getAdminAnalytics, getOperationalInsights } from '@/lib/actions/analytics-actions';
 import { AnalyticsCharts } from '@/components/admin/AnalyticsCharts';
 import { AnalyticsExport } from '@/components/admin/AnalyticsExport';
-import { seedDatabase } from '@/lib/actions/seed-actions';
 import { revalidatePath } from 'next/cache';
 
 export default async function AdminOverviewPage() {
@@ -22,11 +21,7 @@ export default async function AdminOverviewPage() {
 
   const alerts = (insightsResult.success && insightsResult.data) ? insightsResult.data : [];
 
-  const handleSeed = async () => {
-    "use server";
-    await seedDatabase();
-    revalidatePath('/admin');
-  };
+
 
   const kpis = [
     { label: 'Total Revenue', value: `$${data.totalRevenue.toLocaleString()}`, icon: 'payments', color: 'text-primary', bg: 'bg-primary/5' },
@@ -42,11 +37,6 @@ export default async function AdminOverviewPage() {
         <div>
           <div className="flex items-center gap-4">
             <h1 className="text-4xl font-black tracking-tighter text-on-surface font-headline">Control Center</h1>
-            <form action={handleSeed}>
-              <button className="text-[10px] font-black uppercase tracking-widest text-on-surface-variant/40 hover:text-primary transition-colors">
-                (Seed Database)
-              </button>
-            </form>
           </div>
           <p className="mt-2 text-on-surface-variant font-medium font-body italic">"The bird of preminence flies on the wings of data." — Event Logix Admin</p>
         </div>
