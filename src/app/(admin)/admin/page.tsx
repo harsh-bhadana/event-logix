@@ -1,6 +1,7 @@
 import React from 'react';
 import { getAdminAnalytics } from '@/lib/actions/analytics-actions';
 import { AnalyticsCharts } from '@/components/admin/AnalyticsCharts';
+import { AnalyticsExport } from '@/components/admin/AnalyticsExport';
 
 export default async function AdminOverviewPage() {
   const result = await getAdminAnalytics();
@@ -22,9 +23,12 @@ export default async function AdminOverviewPage() {
   return (
     <div className="px-10 py-12 animate-in fade-in slide-in-from-bottom-4 duration-700">
       {/* Header */}
-      <div className="mb-12">
-        <h1 className="text-4xl font-black tracking-tighter text-on-surface font-headline">Control Center</h1>
-        <p className="mt-2 text-on-surface-variant font-medium font-body italic">"The bird of preminence flies on the wings of data." — Event Logix Admin</p>
+      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-8 mb-12">
+        <div>
+          <h1 className="text-4xl font-black tracking-tighter text-on-surface font-headline">Control Center</h1>
+          <p className="mt-2 text-on-surface-variant font-medium font-body italic">"The bird of preminence flies on the wings of data." — Event Logix Admin</p>
+        </div>
+        <AnalyticsExport data={data} />
       </div>
 
       {/* KPI Grid */}

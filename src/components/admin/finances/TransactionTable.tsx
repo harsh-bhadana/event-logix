@@ -2,6 +2,7 @@
 
 import { motion } from "framer-motion";
 import { format } from "date-fns";
+import { downloadCSV } from "@/lib/utils/export-utils";
 
 interface TransactionTableProps {
   transactions: any[];
@@ -9,6 +10,21 @@ interface TransactionTableProps {
 }
 
 export function TransactionTable({ transactions, total }: TransactionTableProps) {
+  const handleExport = () => {
+    const headers = ["ID", "Attendee", "Email", "Event", "TicketType", "Amount", "Status", "Date"];
+    const data = transactions.map(tx => ({
+      ID: tx._id,
+      Attendee: tx.attendeeInfo?.name || 'Anonymous',
+      Email: tx.attendeeInfo?.email || 'N/A',
+      Event: tx.event?.title || 'Unknown',
+      TicketType: tx.ticketType,
+      Amount: tx.totalAmount,
+      Status: tx.paymentStatus,
+      Date: format(new Date(tx.createdAt), 'yyyy-MM-dd HH:mm')
+    }));
+    downloadCSV("transactions.csv", headers, data);
+  };
+
   const getStatusStyles = (status: string) => {
     switch (status) {
       case 'completed':
@@ -29,7 +45,10 @@ export function TransactionTable({ transactions, total }: TransactionTableProps)
           <h3 className="text-xl font-black text-on-surface tracking-tight font-headline">Transaction Ledger</h3>
           <p className="text-xs text-on-surface-variant font-medium">Chronological record of all platform activities</p>
         </div>
-        <button className="flex items-center gap-2 px-4 py-2 rounded-xl bg-surface-container-high hover:bg-surface-container-highest transition-colors text-[10px] font-bold uppercase tracking-widest text-on-surface-variant">
+        <button 
+          onClick={handleExport}
+          className="flex items-center gap-2 px-4 py-2 rounded-xl bg-surface-container-high hover:bg-surface-container-highest transition-colors text-[10px] font-bold uppercase tracking-widest text-on-surface-variant"
+        >
           <span className="material-symbols-outlined text-sm">download</span>
           Export CSV
         </button>

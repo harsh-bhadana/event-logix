@@ -5,6 +5,7 @@ import { format } from "date-fns";
 import { restoreEvent } from "@/lib/actions/archive-actions";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { downloadCSV } from "@/lib/utils/export-utils";
 
 interface ArchiveTableProps {
   events: any[];
@@ -22,8 +23,15 @@ export function ArchiveTable({ events }: ArchiveTableProps) {
   };
 
   const handleExport = (event: any) => {
-    console.log(`Exporting data for ${event.title}...`);
-    alert(`Report generated for ${event.title}.\nDownloading CSV... (Simulated)`);
+    const headers = ["Title", "Category", "Revenue", "Attendance", "ArchivedAt"];
+    const data = [{
+      Title: event.title,
+      Category: event.category,
+      Revenue: event.totalRevenue,
+      Attendance: `${event.attendanceRate}%`,
+      ArchivedAt: format(new Date(event.updatedAt), 'yyyy-MM-dd')
+    }];
+    downloadCSV(`archive-${event.title.toLowerCase().replace(/\s+/g, '-')}.csv`, headers, data);
   };
 
   return (
