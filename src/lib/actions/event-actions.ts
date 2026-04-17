@@ -124,7 +124,14 @@ export async function getStaffOpportunities(filters?: { dateRange?: string; expe
   }
 }
 
-export async function getAdminEvents(filters?: { search?: string; status?: string; page?: number }) {
+export async function getAdminEvents(filters?: { 
+  search?: string; 
+  status?: string; 
+  category?: string;
+  startDate?: string;
+  endDate?: string;
+  page?: number 
+}) {
   try {
     await dbConnect();
     
@@ -132,8 +139,22 @@ export async function getAdminEvents(filters?: { search?: string; status?: strin
     
     if (filters?.status && filters.status !== 'All Events') {
       const statusLower = filters.status.toLowerCase();
-      if (['draft', 'published', 'completed', 'cancelled'].includes(statusLower)) {
+      if (['draft', 'published', 'completed', 'cancelled', 'archived'].includes(statusLower)) {
         query.status = statusLower;
+      }
+    }
+
+    if (filters?.category && filters.category !== 'All Categories') {
+      query.category = filters.category;
+    }
+
+    if (filters?.startDate || filters?.endDate) {
+      query.date = {};
+      if (filters.startDate) {
+        query.date.$gte = new Date(filters.startDate);
+      }
+      if (filters.endDate) {
+        query.date.$lte = new Date(filters.endDate);
       }
     }
     

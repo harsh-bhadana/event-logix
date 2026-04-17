@@ -8,6 +8,9 @@ interface ManageEventsPageProps {
   searchParams: Promise<{
     search?: string;
     status?: string;
+    category?: string;
+    startDate?: string;
+    endDate?: string;
     page?: string;
   }>;
 }
@@ -18,6 +21,9 @@ export default async function AdminEventsPage({ searchParams }: ManageEventsPage
   const filters = {
     search: params.search,
     status: params.status,
+    category: params.category,
+    startDate: params.startDate,
+    endDate: params.endDate,
     page: params.page ? parseInt(params.page, 10) : 1,
   };
 
