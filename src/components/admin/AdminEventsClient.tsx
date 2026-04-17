@@ -30,6 +30,17 @@ export function AdminEventsClient({ initialData, insights }: AdminEventsClientPr
   
   const [search, setSearch] = useState(searchParams.get('search') || '');
   const [status, setStatus] = useState(searchParams.get('status') || 'All Events');
+  const [category, setCategory] = useState(searchParams.get('category') || 'All Categories');
+  const [startDate, setStartDate] = useState(searchParams.get('startDate') || '');
+  const [endDate, setEndDate] = useState(searchParams.get('endDate') || '');
+
+  const categories = [
+    'All Categories',
+    'Corporate Strategy',
+    'Financial Review',
+    'Stakeholder Gala',
+    'Product Launch'
+  ];
 
   const updateFilters = (newParams: Record<string, string>) => {
     const params = new URLSearchParams(searchParams.toString());
@@ -86,6 +97,70 @@ export function AdminEventsClient({ initialData, insights }: AdminEventsClientPr
         </div>
       </div>
 
+      {/* Advanced Filter Row */}
+      <div className="flex flex-wrap items-center gap-4 mb-6">
+         {/* Category Filter */}
+         <div className="relative group min-w-[200px]">
+            <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant text-lg">category</span>
+            <select 
+              value={category}
+              onChange={(e) => {
+                setCategory(e.target.value);
+                updateFilters({ category: e.target.value });
+              }}
+              className="w-full bg-surface-container-low border-none rounded-xl pl-12 pr-10 py-2.5 text-sm focus:ring-2 focus:ring-primary/20 transition-all font-medium text-on-surface appearance-none cursor-pointer"
+            >
+              {categories.map(cat => <option key={cat}>{cat}</option>)}
+            </select>
+            <span className="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-lg pointer-events-none">expand_more</span>
+         </div>
+
+         {/* Date Range Filters */}
+         <div className="flex items-center gap-2 bg-surface-container-low p-1 rounded-xl">
+            <div className="relative">
+              <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-base">calendar_today</span>
+              <input 
+                type="date"
+                value={startDate}
+                onChange={(e) => {
+                  setStartDate(e.target.value);
+                  updateFilters({ startDate: e.target.value });
+                }}
+                className="bg-transparent border-none pl-9 pr-2 py-1.5 text-xs font-bold text-on-surface focus:ring-0 uppercase tracking-tighter"
+                placeholder="From"
+              />
+            </div>
+            <div className="h-4 w-[1px] bg-outline-variant/30"></div>
+            <div className="relative">
+              <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-base">event_busy</span>
+              <input 
+                type="date"
+                value={endDate}
+                onChange={(e) => {
+                  setEndDate(e.target.value);
+                  updateFilters({ endDate: e.target.value });
+                }}
+                className="bg-transparent border-none pl-9 pr-2 py-1.5 text-xs font-bold text-on-surface focus:ring-0 uppercase tracking-tighter"
+                placeholder="To"
+              />
+            </div>
+         </div>
+
+         {(category !== 'All Categories' || startDate || endDate) && (
+           <button 
+             onClick={() => {
+               setCategory('All Categories');
+               setStartDate('');
+               setEndDate('');
+               updateFilters({ category: 'All Categories', startDate: '', endDate: '' });
+             }}
+             className="text-[10px] font-black text-primary uppercase tracking-widest hover:underline px-2"
+           >
+             Clear Filters
+           </button>
+         )}
+      </div>
+
       {/* Filter Bar */}
       <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mb-8 bg-surface-container-low/50 p-1.5 rounded-2xl backdrop-blur-sm">
         <div className="flex items-center gap-1 overflow-x-auto w-full sm:w-auto no-scrollbar">
@@ -105,16 +180,6 @@ export function AdminEventsClient({ initialData, insights }: AdminEventsClientPr
               {tab}
             </button>
           ))}
-        </div>
-        <div className="flex items-center gap-3 w-full sm:w-auto">
-          <div className="h-8 w-[1px] bg-outline-variant opacity-20 hidden sm:block"></div>
-          <button className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-surface-container-lowest border-none text-sm font-medium text-on-surface shadow-sm hover:bg-surface-bright transition-all w-full sm:w-auto justify-between">
-            <div className="flex items-center gap-2">
-              <span className="material-symbols-outlined text-lg text-on-surface-variant">calendar_month</span>
-              <span>Date Range</span>
-            </div>
-            <span className="material-symbols-outlined text-lg text-on-surface-variant">expand_more</span>
-          </button>
         </div>
       </div>
 

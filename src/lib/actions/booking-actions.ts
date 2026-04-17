@@ -234,6 +234,51 @@ export async function updateEventStatus(
   }
 }
 
+export async function bulkUpdateEventStatus(
+  eventIds: string[],
+  status: "published" | "draft" | "cancelled" | "archived"
+) {
+  try {
+    await dbConnect();
+    const session = await getSession();
+    if (!session?.user || session.user.role !== "admin") {
+      return { success: false, message: "Unauthorized." };
+    }
+
+    await Event.updateMany({ _id: { $in: eventIds } }, { status });
+
+    revalidatePath("/admin/events");
+    revalidatePath("/");
+    
+    return { success: true, message: `Updated ${eventIds.length} events to ${status}.` };
+  } catch (error: any) {
+    console.error("bulkUpdateEventStatus error:", error);
+    return { success: false, message: error.message || "Failed to update events." };
+  }
+}
+
+export async function bulkDeleteEvents(eventIds: string[]) {
+  try {
+    await dbConnect();
+    const session = await getSession();
+    if (!session?.user || session.user.role !== "admin") {
+      return { success: false, message: "Unauthorized." };
+    }
+
+    // Optional: Delete associated bookings/tickets if needed, or just let them stay with a 'deleted' event?
+    // For now, let's keep it simple and just delete the events.
+    await Event.deleteMany({ _id: { $in: eventIds } });
+
+    revalidatePath("/admin/events");
+    revalidatePath("/");
+
+    return { success: true, message: `Deleted ${eventIds.length} events.` };
+  } catch (error: any) {
+    console.error("bulkDeleteEvents error:", error);
+    return { success: false, message: error.message || "Failed to delete events." };
+  }
+}
+
 // ── TOGGLE FEATURED (ADMIN) ───────────────────────────────────────────────────
 
 export async function toggleEventFeatured(eventId: string, isFeatured: boolean) {
