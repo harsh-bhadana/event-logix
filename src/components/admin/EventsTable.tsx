@@ -129,6 +129,16 @@ function ActionMenu({ event }: { event: EventRow }) {
               Cancel Event
             </button>
           )}
+          {event.status !== "archived" && (
+            <button
+              type="button"
+              onClick={() => changeStatus("archived")}
+              className="w-full flex items-center gap-3 px-4 py-3 text-sm font-medium text-on-surface-variant hover:bg-surface-container-low transition-colors"
+            >
+              <span className="material-symbols-outlined text-base">inventory_2</span>
+              Archive Event
+            </button>
+          )}
         </div>
       )}
     </div>

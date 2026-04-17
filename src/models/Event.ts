@@ -47,7 +47,7 @@ export interface IEvent extends Document {
     description: string;
     icon: string;
   }>;
-  status: 'draft' | 'published' | 'cancelled';
+  status: 'draft' | 'published' | 'cancelled' | 'archived';
   isFeatured: boolean;
   createdBy: mongoose.Types.ObjectId;
   createdAt: Date;
