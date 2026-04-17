@@ -14,6 +14,6 @@ export const ADMIN_NAV_ITEMS: NavItem[] = [
 ];
 
 export const ADMIN_BOTTOM_ITEMS: NavItem[] = [
-  { label: "Support", href: "#", icon: "headset_mic" },
+  { label: "Support", href: "/admin/support", icon: "headset_mic" },
   { label: "Archive", href: "/admin/archive", icon: "inventory_2" },
 ];
