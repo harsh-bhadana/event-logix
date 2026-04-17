@@ -42,8 +42,8 @@ export async function getAdminAnalytics() {
     ]);
 
     const formattedTrend = revenueTrend.map(d => ({
-      date: format(new Date(d._id), "MMM d"),
-      revenue: d.revenue
+      name: format(new Date(d._id), "MMM d"),
+      value: d.revenue || 0
     }));
 
     return {
