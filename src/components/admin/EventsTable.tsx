@@ -41,7 +41,7 @@ function ActionMenu({ event }: { event: EventRow }) {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  async function changeStatus(status: "published" | "draft" | "cancelled") {
+  async function changeStatus(status: "published" | "draft" | "cancelled" | "archived") {
     setPending(true);
     setOpen(false);
     await updateEventStatus(event._id, status);

@@ -35,9 +35,9 @@ describe('getAdminAnalytics', () => {
     const result = await getAdminAnalytics();
 
     expect(result.success).toBe(true);
-    expect(result.data.totalRevenue).toBe(150);
-    expect(result.data.eventsCount).toBe(10);
-    expect(result.data.staffCount).toBe(25);
-    expect(result.data.ticketsSold).toBe(2);
+    expect(result.data?.totalRevenue).toBe(150);
+    expect(result.data?.eventsCount).toBe(10);
+    expect(result.data?.staffCount).toBe(25);
+    expect(result.data?.ticketsSold).toBe(2);
   });
 });
