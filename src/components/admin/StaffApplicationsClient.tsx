@@ -1,8 +1,10 @@
 'use client';
 
 import React, { useState } from 'react';
-import { updateStaffStatus } from "@/lib/actions/staff-actions";
+import { updateStaffStatus, bulkUpdateStaffStatus } from "@/lib/actions/staff-actions";
 import Image from 'next/image';
+import { BulkActionToolbar } from '../ui/BulkActionToolbar';
+import { toast } from 'sonner';
 
 interface StaffApplicationsClientProps {
   initialApplications: any[];
@@ -11,14 +13,37 @@ interface StaffApplicationsClientProps {
 export function StaffApplicationsClient({ initialApplications }: StaffApplicationsClientProps) {
   const [applications, setApplications] = useState(initialApplications);
   const [loadingId, setLoadingId] = useState<string | null>(null);
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
+  const [isBulkLoading, setIsBulkLoading] = useState(false);
+
+  const toggleSelect = (id: string) => {
+    setSelectedIds((prev: string[]) => 
+      prev.includes(id) ? prev.filter((i: string) => i !== id) : [...prev, id]
+    );
+  };
+
+  const handleBulkStatusUpdate = async (status: 'approved' | 'rejected') => {
+    if (selectedIds.length === 0) return;
+    setIsBulkLoading(true);
+    const result = await bulkUpdateStaffStatus(selectedIds, status);
+    
+    if (result.success) {
+      toast.success(result.message);
+      setApplications((prev: any[]) => prev.filter((app: any) => !selectedIds.includes(app._id)));
+      setSelectedIds([]);
+    } else {
+      toast.error(result.error || "Bulk update failed");
+    }
+    setIsBulkLoading(false);
+  };
 
   const handleStatusUpdate = async (userId: string, status: 'approved' | 'rejected') => {
     setLoadingId(userId);
     const result = await updateStaffStatus(userId, status);
     if (result.success) {
-      setApplications(prev => prev.filter(app => app._id !== userId));
+      setApplications((prev: any[]) => prev.filter((app: any) => app._id !== userId));
     } else {
-      alert(result.error);
+      toast.error(result.error);
     }
     setLoadingId(null);
   };
@@ -36,10 +61,34 @@ export function StaffApplicationsClient({ initialApplications }: StaffApplicatio
   }
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-      {applications.map((app) => (
-        <div key={app._id} className="bg-white rounded-[2.5rem] p-8 shadow-sm border border-outline-variant/5 hover:shadow-xl transition-all group">
-          <div className="flex items-center gap-5 mb-8">
+    <>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 relative">
+        {applications.map((app) => (
+          <div 
+            key={app._id} 
+            onClick={() => toggleSelect(app._id)}
+            className={`
+              bg-white rounded-[2.5rem] p-8 shadow-sm border transition-all group relative cursor-pointer
+              ${selectedIds.includes(app._id) 
+                ? 'border-primary ring-4 ring-primary/5 bg-primary/[0.01]' 
+                : 'border-outline-variant/5 hover:shadow-xl'
+              }
+            `}
+          >
+            {/* Selection Checkbox */}
+            <div className={`
+              absolute top-6 right-8 w-6 h-6 rounded-lg border-2 flex items-center justify-center transition-all
+              ${selectedIds.includes(app._id)
+                ? 'bg-primary border-primary scale-110 shadow-lg shadow-primary/20'
+                : 'border-outline-variant/20 bg-surface-container-low opacity-0 group-hover:opacity-100'
+              }
+            `}>
+              {selectedIds.includes(app._id) && (
+                <span className="material-symbols-outlined text-on-primary text-sm font-black">check</span>
+              )}
+            </div>
+
+            <div className="flex items-center gap-5 mb-8">
             <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center overflow-hidden">
               {app.staffProfile?.profileImage ? (
                 <Image src={app.staffProfile.profileImage} width={64} height={64} alt={app.name} className="object-cover" />
@@ -92,5 +141,27 @@ export function StaffApplicationsClient({ initialApplications }: StaffApplicatio
         </div>
       ))}
     </div>
+
+    <BulkActionToolbar 
+      selectedCount={selectedIds.length}
+      onClear={() => setSelectedIds([])}
+      actions={[
+        {
+          label: "Approve Selected",
+          icon: "check_circle",
+          variant: "primary",
+          onClick: () => handleBulkStatusUpdate('approved'),
+          loading: isBulkLoading
+        },
+        {
+          label: "Reject Selected",
+          icon: "cancel",
+          variant: "error",
+          onClick: () => handleBulkStatusUpdate('rejected'),
+          loading: isBulkLoading
+        }
+      ]}
+    />
+  </>
   );
 }

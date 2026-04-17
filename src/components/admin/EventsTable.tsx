@@ -4,7 +4,9 @@ import { format } from "date-fns";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
-import { updateEventStatus, toggleEventFeatured } from "@/lib/actions/booking-actions";
+import { updateEventStatus, toggleEventFeatured, bulkUpdateEventStatus, bulkDeleteEvents } from "@/lib/actions/booking-actions";
+import { BulkActionToolbar } from "../ui/BulkActionToolbar";
+import { toast } from "sonner";
 
 interface EventRow {
   _id: string;
@@ -148,6 +150,49 @@ function ActionMenu({ event }: { event: EventRow }) {
 export function EventsTable({ events, total, page, pages }: EventsTableProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
+  const [isBulkLoading, setIsBulkLoading] = useState(false);
+
+  const toggleSelectAll = () => {
+    if (selectedIds.length === events.length) {
+      setSelectedIds([]);
+    } else {
+      setSelectedIds(events.map(e => e._id));
+    }
+  };
+
+  const toggleSelect = (id: string) => {
+    setSelectedIds(prev => 
+      prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]
+    );
+  };
+
+  const handleBulkUpdate = async (status: "published" | "draft" | "cancelled" | "archived") => {
+    setIsBulkLoading(true);
+    const result = await bulkUpdateEventStatus(selectedIds, status);
+    if (result.success) {
+      toast.success(result.message);
+      setSelectedIds([]);
+      router.refresh();
+    } else {
+      toast.error(result.message);
+    }
+    setIsBulkLoading(false);
+  };
+
+  const handleBulkDelete = async () => {
+    if (!confirm(`Are you sure you want to delete ${selectedIds.length} events?`)) return;
+    setIsBulkLoading(true);
+    const result = await bulkDeleteEvents(selectedIds);
+    if (result.success) {
+      toast.success(result.message);
+      setSelectedIds([]);
+      router.refresh();
+    } else {
+      toast.error(result.message);
+    }
+    setIsBulkLoading(false);
+  };
 
   const handlePageChange = (newPage: number) => {
     const params = new URLSearchParams(searchParams.toString());
@@ -167,7 +212,23 @@ export function EventsTable({ events, total, page, pages }: EventsTableProps) {
         <table className="w-full text-left border-collapse">
           <thead>
             <tr className="bg-surface-container-low/30">
-              <th className="px-8 py-5 text-[11px] font-bold text-on-surface-variant uppercase tracking-widest">Event Info</th>
+              <th className="pl-8 pr-4 py-5 w-10">
+                <button 
+                  onClick={toggleSelectAll}
+                  className={`w-5 h-5 rounded border-2 flex items-center justify-center transition-all ${
+                    selectedIds.length > 0 && selectedIds.length === events.length 
+                      ? "bg-primary border-primary" 
+                      : "border-outline-variant/30 hover:border-primary/50"
+                  }`}
+                >
+                  {selectedIds.length > 0 && (
+                    <span className="material-symbols-outlined text-[14px] text-on-primary font-black">
+                      {selectedIds.length === events.length ? "check" : "remove"}
+                    </span>
+                  )}
+                </button>
+              </th>
+              <th className="px-4 py-5 text-[11px] font-bold text-on-surface-variant uppercase tracking-widest">Event Info</th>
               <th className="px-6 py-5 text-[11px] font-bold text-on-surface-variant uppercase tracking-widest">Category</th>
               <th className="px-6 py-5 text-[11px] font-bold text-on-surface-variant uppercase tracking-widest">Tickets Sold</th>
               <th className="px-6 py-5 text-[11px] font-bold text-on-surface-variant uppercase tracking-widest">Staffing</th>
@@ -191,8 +252,25 @@ export function EventsTable({ events, total, page, pages }: EventsTableProps) {
                 const isFullyStaffed = event.staffFilled >= event.totalStaff;
 
                 return (
-                  <tr key={event._id} className="hover:bg-surface-container-low/30 transition-colors group">
-                    <td className="px-8 py-6">
+                  <tr 
+                    key={event._id} 
+                    className={`hover:bg-surface-container-low/30 transition-colors group ${selectedIds.includes(event._id) ? "bg-primary/[0.02]" : ""}`}
+                  >
+                    <td className="pl-8 pr-4 py-6">
+                      <button 
+                        onClick={() => toggleSelect(event._id)}
+                        className={`w-5 h-5 rounded border-2 flex items-center justify-center transition-all ${
+                          selectedIds.includes(event._id) 
+                            ? "bg-primary border-primary" 
+                            : "border-outline-variant/30 opacity-0 group-hover:opacity-100"
+                        }`}
+                      >
+                        {selectedIds.includes(event._id) && (
+                          <span className="material-symbols-outlined text-[14px] text-on-primary font-black">check</span>
+                        )}
+                      </button>
+                    </td>
+                    <td className="px-4 py-6">
                       <div className="flex items-center gap-4">
                         <div className="w-14 h-14 rounded-xl overflow-hidden bg-surface-container flex-shrink-0">
                           <img
@@ -308,6 +386,33 @@ export function EventsTable({ events, total, page, pages }: EventsTableProps) {
           </div>
         </div>
       )}
+
+      <BulkActionToolbar 
+        selectedCount={selectedIds.length}
+        onClear={() => setSelectedIds([])}
+        actions={[
+          {
+            label: "Publish",
+            icon: "publish",
+            onClick: () => handleBulkUpdate("published"),
+            loading: isBulkLoading
+          },
+          {
+            label: "Archive",
+            icon: "inventory_2",
+            onClick: () => handleBulkUpdate("archived"),
+            loading: isBulkLoading
+          },
+          {
+            label: "Delete",
+            icon: "delete",
+            variant: "error",
+            onClick: handleBulkDelete,
+            loading: isBulkLoading
+          }
+        ]}
+      />
     </div>
   );
 }
+

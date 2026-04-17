@@ -68,6 +68,31 @@ export async function updateStaffStatus(userId: string, status: 'approved' | 're
   }
 }
 
+export async function bulkUpdateStaffStatus(userIds: string[], status: 'approved' | 'rejected', reason?: string) {
+  try {
+    await dbConnect();
+    
+    const results = await Promise.all(
+      userIds.map(id => updateStaffStatus(id, status, reason))
+    );
+
+    const failures = results.filter(r => !r.success);
+    
+    if (failures.length > 0) {
+      return { 
+        success: false, 
+        message: `Updated with ${failures.length} failures`, 
+        error: failures[0].error 
+      };
+    }
+
+    return { success: true, message: `Successfully ${status} ${userIds.length} staff applications` };
+  } catch (error: any) {
+    console.error("Error in bulk update staff:", error);
+    return { success: false, error: error.message || "Bulk update failed" };
+  }
+}
+
 export async function getMasterRoster() {
   try {
     await dbConnect();
