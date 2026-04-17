@@ -16,12 +16,17 @@ export async function publishEvent(data: WizardData) {
         ? [{ name: "General Admission", price: 0, quantity: parseInt(data.totalQuantity, 10) || 0 }]
         : [{ name: "Standard", price: parseFloat(data.ticketPrice) || 0, quantity: parseInt(data.totalQuantity, 10) || 0 }];
 
+    const eventDate = new Date(data.date);
+    if (isNaN(eventDate.getTime()) || eventDate.getFullYear() > 2100) {
+      return { success: false, message: "Please provide a valid date within a reasonable range." };
+    }
+
     const eventData = {
       title: data.title,
       description: data.description,
       imageUrl: data.bannerImage ?? null,
       category: data.category,
-      date: new Date(data.date),
+      date: eventDate,
       locationName: "TBD",
       location: {
         type: "Point" as const,

@@ -212,7 +212,7 @@ export async function applyForStaffRole(input: ApplyForRoleInput) {
 
 export async function updateEventStatus(
   eventId: string,
-  status: "published" | "draft" | "cancelled"
+  status: "published" | "draft" | "cancelled" | "archived"
 ) {
   try {
     await dbConnect();

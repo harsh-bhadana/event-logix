@@ -1,6 +1,7 @@
 import { getSession } from "@/lib/auth";
 import { logout } from "@/lib/actions/auth-actions";
 import { NotificationDropdown } from "./NotificationDropdown";
+import { MobileNav } from "./MobileNav";
 
 interface TopAppBarProps {
   title?: string;
@@ -23,13 +24,14 @@ export async function TopAppBar({ title = "Event Logix" }: TopAppBarProps) {
   const userId = session?.user?.id?.toString() || "";
 
   return (
-    <header className="bg-[#fbf9f7] dark:bg-neutral-900 flex justify-between items-center px-8 h-16 w-full fixed top-0 z-50 border-b border-outline-variant/10">
-      <div className="flex items-center gap-4">
-        <span className="font-headline font-bold text-primary dark:text-primary-fixed tracking-tighter text-xl cursor-default">
-          Event Logix
+    <header className="bg-[#fbf9f7] dark:bg-neutral-900 flex justify-between items-center px-4 md:px-8 h-16 w-full fixed top-0 z-50 border-b border-outline-variant/10 transition-colors">
+      <div className="flex items-center gap-2 md:gap-4">
+        <MobileNav />
+        <span className="hidden sm:block font-headline font-bold text-primary dark:text-primary-fixed tracking-tighter text-lg md:text-xl cursor-default uppercase">
+          EL
         </span>
-        <div className="bg-surface-variant dark:bg-neutral-800 h-6 w-[1px] mx-2" />
-        <span className="font-headline font-semibold text-lg tracking-tight text-primary dark:text-primary-fixed cursor-default">
+        <div className="hidden sm:block bg-surface-variant dark:bg-neutral-800 h-6 w-[1px] mx-1 md:mx-2" />
+        <span className="font-headline font-semibold text-base md:text-lg tracking-tight text-primary dark:text-primary-fixed cursor-default truncate max-w-[150px] md:max-w-none">
           {title}
         </span>
       </div>

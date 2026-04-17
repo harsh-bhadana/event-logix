@@ -52,6 +52,14 @@ export default function EventWizard() {
     }
   };
 
+  const scrollContainerRef = React.useRef<HTMLDivElement>(null);
+
+  React.useEffect(() => {
+    if (scrollContainerRef.current) {
+      scrollContainerRef.current.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  }, [currentStep]);
+
   const renderStep = () => {
     switch (currentStep) {
       case 1: return <Step1BasicInfo />;
@@ -128,7 +136,10 @@ export default function EventWizard() {
 
       {/* Main Content Area */}
       <main className="flex-1 flex flex-col relative bg-surface-container-lowest overflow-hidden">
-        <div className="flex-1 overflow-y-auto custom-scrollbar">
+        <div 
+          ref={scrollContainerRef}
+          className="flex-1 overflow-y-auto custom-scrollbar scroll-smooth"
+        >
           <AnimatePresence mode="wait">
             <motion.div
               key={currentStep}

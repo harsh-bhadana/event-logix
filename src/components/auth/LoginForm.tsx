@@ -22,7 +22,7 @@ export default function LoginForm() {
       // Redirect based on role
       switch (result.role) {
         case 'admin':
-          router.push("/admin/events");
+          router.push("/admin");
           break;
         case 'staff':
           router.push("/staff/jobs");

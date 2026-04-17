@@ -196,8 +196,16 @@ export async function verifyTicket(bookingIdOrQr: string) {
       return { success: false, error: "Invalid Ticket: Payment not completed" };
     }
 
-    // Check if already checked in (we should add a checkedIn field)
-    // For now, let's assume it's valid if found.
+    if (booking.checkedInAt) {
+      return { 
+        success: false, 
+        error: `Already checked in at ${new Date(booking.checkedInAt).toLocaleTimeString()}`
+      };
+    }
+
+    // Set check-in time
+    booking.checkedInAt = new Date();
+    await booking.save();
     
     return {
       success: true,

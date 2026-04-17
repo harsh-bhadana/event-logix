@@ -9,6 +9,7 @@ export interface IBooking extends Document {
   paymentStatus: "pending" | "completed" | "refunded";
   paymentId?: string;
   qrCode?: string;
+  checkedInAt?: Date;
   attendeeInfo?: {
     name: string;
     email: string;
@@ -32,6 +33,7 @@ const BookingSchema = new Schema<IBooking>(
     },
     paymentId: String,
     qrCode: String,
+    checkedInAt: Date,
     attendeeInfo: {
       name: String,
       email: String,
