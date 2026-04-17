@@ -1,16 +1,31 @@
 import React from 'react';
-import { getAdminAnalytics } from '@/lib/actions/analytics-actions';
+import { getAdminAnalytics, getOperationalInsights } from '@/lib/actions/analytics-actions';
 import { AnalyticsCharts } from '@/components/admin/AnalyticsCharts';
 import { AnalyticsExport } from '@/components/admin/AnalyticsExport';
+import { seedDatabase } from '@/lib/actions/seed-actions';
+import { revalidatePath } from 'next/cache';
 
 export default async function AdminOverviewPage() {
-  const result = await getAdminAnalytics();
-  const data = (result.success && result.data) ? result.data : {
+  const [analyticsResult, insightsResult] = await Promise.all([
+    getAdminAnalytics(),
+    getOperationalInsights()
+  ]);
+
+  const data = (analyticsResult.success && analyticsResult.data) ? analyticsResult.data : {
     totalRevenue: 0,
     eventsCount: 0,
     staffCount: 0,
     ticketsSold: 0,
-    revenueTrend: []
+    revenueTrend: [],
+    categorySales: []
+  };
+
+  const alerts = (insightsResult.success && insightsResult.data) ? insightsResult.data : [];
+
+  const handleSeed = async () => {
+    "use server";
+    await seedDatabase();
+    revalidatePath('/admin');
   };
 
   const kpis = [
@@ -25,7 +40,14 @@ export default async function AdminOverviewPage() {
       {/* Header */}
       <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-8 mb-12">
         <div>
-          <h1 className="text-4xl font-black tracking-tighter text-on-surface font-headline">Control Center</h1>
+          <div className="flex items-center gap-4">
+            <h1 className="text-4xl font-black tracking-tighter text-on-surface font-headline">Control Center</h1>
+            <form action={handleSeed}>
+              <button className="text-[10px] font-black uppercase tracking-widest text-on-surface-variant/40 hover:text-primary transition-colors">
+                (Seed Database)
+              </button>
+            </form>
+          </div>
           <p className="mt-2 text-on-surface-variant font-medium font-body italic">"The bird of preminence flies on the wings of data." — Event Logix Admin</p>
         </div>
         <AnalyticsExport data={data} />
@@ -45,29 +67,27 @@ export default async function AdminOverviewPage() {
       </div>
 
       {/* Charts Section */}
-      <AnalyticsCharts revenueData={data.revenueTrend} />
+      <AnalyticsCharts 
+        revenueData={data.revenueTrend} 
+        categoryData={data.categorySales} 
+      />
 
-      {/* Upcoming Alerts / Feed (Placeholder for now) */}
+      {/* Operational Insights Section */}
       <div className="mt-12 p-8 bg-surface-container-low rounded-[3rem] border border-outline-variant/5">
         <div className="flex items-center justify-between mb-8">
           <h2 className="text-2xl font-black text-on-surface font-headline">Operational Insights</h2>
           <button className="text-sm font-bold text-primary hover:underline">View All Alerts</button>
         </div>
         <div className="space-y-4">
-          <div className="flex items-center gap-6 p-4 bg-white rounded-2xl border border-outline-variant/5">
-            <div className="w-2 h-2 rounded-full bg-error animate-pulse" />
-            <p className="flex-1 text-sm font-medium text-on-surface-variant">
-              **Tech Summit 2024** is missing 3 Security personnel for tomorrow's shift.
-            </p>
-            <button className="px-4 py-2 bg-error/5 text-error text-xs font-black rounded-lg hover:bg-error/10 transition-colors">Resolve</button>
-          </div>
-          <div className="flex items-center gap-6 p-4 bg-white rounded-2xl border border-outline-variant/5">
-            <div className="w-2 h-2 rounded-full bg-primary" />
-            <p className="flex-1 text-sm font-medium text-on-surface-variant">
-              **Neon Music Fest** just hit 90% ticket capacity. Expanding waitlist.
-            </p>
-            <button className="px-4 py-2 bg-primary/5 text-primary text-xs font-black rounded-lg hover:bg-primary/10 transition-colors">Details</button>
-          </div>
+          {alerts.map((alert: any) => (
+            <div key={alert.id} className="flex items-center gap-6 p-4 bg-white rounded-2xl border border-outline-variant/5">
+              <div className={`w-2 h-2 rounded-full ${alert.severity === 'error' ? 'bg-error animate-pulse' : 'bg-primary'}`} />
+              <p className="flex-1 text-sm font-medium text-on-surface-variant" dangerouslySetInnerHTML={{ __html: alert.message.replace(/\*\*(.*?)\*\*/g, '<span class="font-bold text-on-surface">$1</span>') }} />
+              <button className={`px-4 py-2 ${alert.severity === 'error' ? 'bg-error/5 text-error' : 'bg-primary/5 text-primary'} text-xs font-black rounded-lg hover:opacity-80 transition-colors`}>
+                {alert.action}
+              </button>
+            </div>
+          ))}
         </div>
       </div>
     </div>

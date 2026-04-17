@@ -8,9 +8,10 @@ import {
 
 interface AnalyticsChartsProps {
   revenueData: Array<{ name: string; value: number }>;
+  categoryData: Array<{ name: string; value: number }>;
 }
 
-export function AnalyticsCharts({ revenueData }: AnalyticsChartsProps) {
+export function AnalyticsCharts({ revenueData, categoryData }: AnalyticsChartsProps) {
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
       {/* Revenue Trend Chart */}
@@ -74,19 +75,13 @@ export function AnalyticsCharts({ revenueData }: AnalyticsChartsProps) {
         <h3 className="text-xl font-black tracking-tight text-on-surface mb-8">Sales by Category</h3>
         <div className="h-[300px] w-full">
           <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={[
-              { name: 'Concerts', value: 45 },
-              { name: 'Tech', value: 30 },
-              { name: 'Workshops', value: 25 },
-              { name: 'Sports', value: 15 },
-              { name: 'Arts', value: 10 },
-            ]}>
+            <BarChart data={categoryData}>
               <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E6E1E5" />
               <XAxis 
                 dataKey="name" 
                 axisLine={false} 
                 tickLine={false} 
-                tick={{ fill: '#49454F', fontSize: 12, fontWeight: 500 }}
+                tick={{ fill: '#49454F', fontSize: 10, fontWeight: 500 }}
                 dy={10}
               />
               <YAxis hide />
@@ -100,7 +95,7 @@ export function AnalyticsCharts({ revenueData }: AnalyticsChartsProps) {
                 }}
               />
               <Bar dataKey="value" radius={[8, 8, 8, 8]} barSize={40}>
-                {[0, 1, 2, 3, 4].map((entry, index) => (
+                {categoryData.map((entry, index) => (
                   <Cell key={`cell-${index}`} fill={index === 0 ? '#6750A4' : '#E8DEF8'} />
                 ))}
               </Bar>
