@@ -8,6 +8,7 @@ import { getSession } from "@/lib/auth";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createNotification } from "./notification-actions";
+import { logAdminAction } from "./audit-actions";
 
 // ── BOOKING ──────────────────────────────────────────────────────────────────
 
@@ -221,7 +222,17 @@ export async function updateEventStatus(
       return { success: false, message: "Unauthorized." };
     }
 
-    await Event.findByIdAndUpdate(eventId, { status });
+    const event = await Event.findByIdAndUpdate(eventId, { status });
+    
+    // Log Audit
+    if (event) {
+      await logAdminAction({
+        action: "update_event_status",
+        targetType: "Event",
+        targetId: eventId,
+        details: { prevStatus: event.status, newStatus: status, title: event.title }
+      });
+    }
 
     revalidatePath("/admin/events");
     revalidatePath("/");
@@ -247,6 +258,13 @@ export async function bulkUpdateEventStatus(
 
     await Event.updateMany({ _id: { $in: eventIds } }, { status });
 
+    // Log Audit
+    await logAdminAction({
+      action: "bulk_update_event_status",
+      targetType: "Event",
+      details: { eventIds, newStatus: status }
+    });
+
     revalidatePath("/admin/events");
     revalidatePath("/");
     
@@ -265,9 +283,17 @@ export async function bulkDeleteEvents(eventIds: string[]) {
       return { success: false, message: "Unauthorized." };
     }
 
-    // Optional: Delete associated bookings/tickets if needed, or just let them stay with a 'deleted' event?
-    // For now, let's keep it simple and just delete the events.
+    // Get the details before deleting
+    const events = await Event.find({ _id: { $in: eventIds } }).select("title").lean();
+
     await Event.deleteMany({ _id: { $in: eventIds } });
+
+    // Log Audit
+    await logAdminAction({
+      action: "bulk_delete_events",
+      targetType: "Event",
+      details: { eventIds, deletedEvents: events.map(e => ({ id: e._id.toString(), title: e.title })) }
+    });
 
     revalidatePath("/admin/events");
     revalidatePath("/");

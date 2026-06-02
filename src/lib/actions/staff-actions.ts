@@ -8,6 +8,7 @@ import { getSession } from "@/lib/auth";
 import ScanLog from "@/models/ScanLog";
 import { revalidatePath } from "next/cache";
 import { createNotification } from "./notification-actions";
+import { logAdminAction } from "./audit-actions";
 
 export async function getStaffApplications() {
   try {
@@ -48,6 +49,14 @@ export async function updateStaffStatus(userId: string, status: 'approved' | 're
       return { success: false, error: "User not found" };
     }
 
+    // Log Audit
+    await logAdminAction({
+      action: status === 'approved' ? 'approve_staff' : 'reject_staff',
+      targetType: 'User',
+      targetId: userId,
+      details: { staffName: user.name, staffEmail: user.email, reason }
+    });
+
     // Notify Staff
     await createNotification(userId, {
       title: status === 'approved' ? 'Application Approved!' : 'Application Update',
@@ -75,6 +84,9 @@ export async function bulkUpdateStaffStatus(userIds: string[], status: 'approved
   try {
     await dbConnect();
     
+    // Fetch users before updating to log their details
+    const users = await User.find({ _id: { $in: userIds } }).select("name email").lean();
+
     const results = await Promise.all(
       userIds.map(id => updateStaffStatus(id, status, reason))
     );
@@ -88,6 +100,13 @@ export async function bulkUpdateStaffStatus(userIds: string[], status: 'approved
         error: failures[0].error 
       };
     }
+
+    // Log Audit
+    await logAdminAction({
+      action: status === 'approved' ? 'bulk_approve_staff' : 'bulk_reject_staff',
+      targetType: 'User',
+      details: { userIds, staffDetails: users.map(u => ({ id: u._id.toString(), name: u.name, email: u.email })), reason }
+    });
 
     return { success: true, message: `Successfully ${status} ${userIds.length} staff applications` };
   } catch (error: any) {
