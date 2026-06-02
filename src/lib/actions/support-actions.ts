@@ -24,7 +24,7 @@ export async function searchBookings(query: string, eventId?: string) {
     if (query) {
       const term = { $regex: query, $options: 'i' };
       
-      const filterConditions = [
+      const filterConditions: any[] = [
         { "attendeeInfo.name": term },
         { "attendeeInfo.email": term },
         { "attendeeInfo.phone": term },
