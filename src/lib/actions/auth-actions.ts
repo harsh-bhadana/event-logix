@@ -7,6 +7,7 @@ import { login_session, logout_session } from "@/lib/auth";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import dbConnect from "@/lib/mongodb";
+import { logAdminAction } from "./audit-actions";
 
 export async function registerStaff(data: StaffOnboardingData) {
   try {
@@ -67,6 +68,14 @@ export async function login(formData: FormData) {
 
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
+      if (user.role === 'admin') {
+        await logAdminAction({
+          action: "admin_login_failed",
+          targetType: "User",
+          targetId: user._id.toString(),
+          details: { email }
+        });
+      }
       return { success: false, message: "Invalid email or password" };
     }
 
@@ -78,6 +87,15 @@ export async function login(formData: FormData) {
       onboardingStatus: user.staffProfile?.onboardingStatus,
       isVerified: user.staffProfile?.isVerified
     });
+
+    if (user.role === 'admin') {
+      await logAdminAction({
+        action: "admin_login_success",
+        targetType: "User",
+        targetId: user._id.toString(),
+        details: { email }
+      });
+    }
 
     return { success: true, role: user.role };
   } catch (error: any) {

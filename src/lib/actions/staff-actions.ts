@@ -3,8 +3,12 @@
 import dbConnect from "@/lib/mongodb";
 import User from "@/models/User";
 import Event from "@/models/Event";
+import Booking from "@/models/Booking";
+import { getSession } from "@/lib/auth";
+import ScanLog from "@/models/ScanLog";
 import { revalidatePath } from "next/cache";
 import { createNotification } from "./notification-actions";
+import { logAdminAction } from "./audit-actions";
 
 export async function getStaffApplications() {
   try {
@@ -45,6 +49,14 @@ export async function updateStaffStatus(userId: string, status: 'approved' | 're
       return { success: false, error: "User not found" };
     }
 
+    // Log Audit
+    await logAdminAction({
+      action: status === 'approved' ? 'approve_staff' : 'reject_staff',
+      targetType: 'User',
+      targetId: userId,
+      details: { staffName: user.name, staffEmail: user.email, reason }
+    });
+
     // Notify Staff
     await createNotification(userId, {
       title: status === 'approved' ? 'Application Approved!' : 'Application Update',
@@ -72,6 +84,9 @@ export async function bulkUpdateStaffStatus(userIds: string[], status: 'approved
   try {
     await dbConnect();
     
+    // Fetch users before updating to log their details
+    const users = await User.find({ _id: { $in: userIds } }).select("name email").lean();
+
     const results = await Promise.all(
       userIds.map(id => updateStaffStatus(id, status, reason))
     );
@@ -85,6 +100,13 @@ export async function bulkUpdateStaffStatus(userIds: string[], status: 'approved
         error: failures[0].error 
       };
     }
+
+    // Log Audit
+    await logAdminAction({
+      action: status === 'approved' ? 'bulk_approve_staff' : 'bulk_reject_staff',
+      targetType: 'User',
+      details: { userIds, staffDetails: users.map(u => ({ id: u._id.toString(), name: u.name, email: u.email })), reason }
+    });
 
     return { success: true, message: `Successfully ${status} ${userIds.length} staff applications` };
   } catch (error: any) {
@@ -198,11 +220,11 @@ export async function requestPayout(userId: string, amount: number, details: any
   }
 }
 
-import Booking from "@/models/Booking";
-
-export async function verifyTicket(bookingIdOrQr: string) {
+export async function verifyTicket(bookingIdOrQr: string, expectedEventId?: string) {
   try {
     await dbConnect();
+    const session = await getSession();
+    const scannedBy = session?.user?.id || null;
     
     // Check if it's a booking ID or a QR code ID
     // Our QR codes are usually strings like "qr_..." or the booking ID itself
@@ -214,23 +236,81 @@ export async function verifyTicket(bookingIdOrQr: string) {
     }).populate('event');
 
     if (!booking) {
+      if (expectedEventId) {
+        await ScanLog.create({
+          event: expectedEventId,
+          ticketCode: bookingIdOrQr,
+          scannedBy,
+          status: "failure",
+          errorReason: "Invalid Ticket: No booking found"
+        });
+      }
       return { success: false, error: "Invalid Ticket: No booking found" };
     }
 
+    const eventId = booking.event._id.toString();
+
+    // Check event mismatch if expectedEventId is provided
+    if (expectedEventId && expectedEventId !== eventId) {
+      await ScanLog.create({
+        event: expectedEventId,
+        booking: booking._id,
+        ticketCode: bookingIdOrQr,
+        scannedBy,
+        status: "failure",
+        errorReason: `Ticket belongs to a different event: ${(booking.event as any).title}`
+      });
+      return { 
+        success: false, 
+        error: `Ticket belongs to a different event: ${(booking.event as any).title}` 
+      };
+    }
+
     if (booking.paymentStatus !== 'completed') {
+      await ScanLog.create({
+        event: eventId,
+        booking: booking._id,
+        ticketCode: bookingIdOrQr,
+        scannedBy,
+        status: "failure",
+        errorReason: "Invalid Ticket: Payment not completed"
+      });
       return { success: false, error: "Invalid Ticket: Payment not completed" };
     }
 
     if (booking.checkedInAt) {
+      const formattedTime = new Date(booking.checkedInAt).toLocaleTimeString();
+      await ScanLog.create({
+        event: eventId,
+        booking: booking._id,
+        ticketCode: bookingIdOrQr,
+        scannedBy,
+        status: "failure",
+        errorReason: `Already checked in at ${formattedTime}`
+      });
       return { 
         success: false, 
-        error: `Already checked in at ${new Date(booking.checkedInAt).toLocaleTimeString()}`
+        error: `Already checked in at ${formattedTime}`
       };
     }
 
     // Set check-in time
     booking.checkedInAt = new Date();
     await booking.save();
+
+    // Log success
+    await ScanLog.create({
+      event: eventId,
+      booking: booking._id,
+      ticketCode: bookingIdOrQr,
+      scannedBy,
+      status: "success"
+    });
+
+    revalidatePath(`/admin/events/${eventId}/checkin`);
+    revalidatePath(`/admin/events/${eventId}/roster`);
+    revalidatePath(`/admin/events/${eventId}`);
+    revalidatePath(`/admin/gate`);
     
     return {
       success: true,
@@ -249,6 +329,111 @@ export async function verifyTicket(bookingIdOrQr: string) {
 
 function isValidObjectId(id: string) {
   return /^[0-9a-fA-F]{24}$/.test(id);
+}
+
+export async function getRecentScans(eventId?: string) {
+  try {
+    await dbConnect();
+    const query: any = {};
+    if (eventId) {
+      query.event = eventId;
+    }
+    
+    const scans = await ScanLog.find(query)
+      .populate('booking')
+      .populate('scannedBy', 'name email')
+      .sort({ scannedAt: -1 })
+      .limit(50)
+      .lean();
+
+    return {
+      success: true,
+      data: JSON.parse(JSON.stringify(scans))
+    };
+  } catch (error: any) {
+    console.error("Error getting recent scans:", error);
+    return { success: false, error: error.message || "Failed to fetch scans", data: [] };
+  }
+}
+
+export async function getInGateRoster(eventId: string) {
+  try {
+    await dbConnect();
+    const bookings = await Booking.find({ 
+      event: eventId,
+      paymentStatus: 'completed'
+    }).lean();
+
+    return {
+      success: true,
+      data: JSON.parse(JSON.stringify(bookings))
+    };
+  } catch (error: any) {
+    console.error("Error getting in-gate roster:", error);
+    return { success: false, error: error.message || "Failed to fetch roster", data: [] };
+  }
+}
+
+export async function manuallyCheckInAttendee(bookingId: string) {
+  try {
+    await dbConnect();
+    const session = await getSession();
+    if (!session?.user || session.user.role !== 'admin') {
+      return { success: false, error: "Unauthorized" };
+    }
+
+    const booking = await Booking.findById(bookingId);
+    if (!booking) {
+      return { success: false, error: "Booking not found" };
+    }
+
+    if (booking.checkedInAt) {
+      // Toggle check-in off (check-out)
+      booking.checkedInAt = undefined;
+      await booking.save();
+
+      // Log manual check-out
+      await ScanLog.create({
+        event: booking.event,
+        booking: booking._id,
+        ticketCode: booking._id.toString(),
+        scannedBy: session.user.id,
+        status: "success",
+        errorReason: "Manual checkout by admin"
+      });
+
+      revalidatePath(`/admin/events/${booking.event.toString()}/checkin`);
+      revalidatePath(`/admin/events/${booking.event.toString()}/roster`);
+      revalidatePath(`/admin/events/${booking.event.toString()}`);
+      revalidatePath(`/admin/gate`);
+      
+      return { success: true, message: "Attendee checked out manually." };
+    } else {
+      // Check-in
+      booking.checkedInAt = new Date();
+      await booking.save();
+
+      // Log manual check-in
+      await ScanLog.create({
+        event: booking.event,
+        booking: booking._id,
+        ticketCode: booking._id.toString(),
+        scannedBy: session.user.id,
+        status: "success",
+        errorReason: "Manual checkin by admin"
+      });
+
+      revalidatePath(`/admin/events/${booking.event.toString()}/checkin`);
+      revalidatePath(`/admin/events/${booking.event.toString()}/roster`);
+      revalidatePath(`/admin/events/${booking.event.toString()}`);
+      revalidatePath(`/admin/gate`);
+
+      return { success: true, message: "Attendee checked in manually." };
+    }
+  } catch (error: any) {
+    console.error("Error manually checking in attendee:", error);
+    return { success: false, error: error.message || "Manual check-in failed" };
+  }
 }
 
 export async function getStaffSchedule(userId: string) {

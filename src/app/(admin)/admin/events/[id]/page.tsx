@@ -2,6 +2,7 @@ import React from 'react';
 import { getEventRoster } from '@/lib/actions/roster-actions';
 import Link from 'next/link';
 import Image from 'next/image';
+import EventAnalyticsCharts from '@/components/admin/EventAnalyticsCharts';
 
 interface PageProps {
   params: Promise<{ id: string }>;
@@ -137,46 +138,85 @@ export default async function AdminEventDetailPage({ params }: PageProps) {
                 <span className="text-[10px] font-bold text-on-surface-variant uppercase tracking-widest">Check-ins</span>
              </div>
              <h3 className="text-3xl font-black text-on-surface font-headline tracking-tighter italic">
-               {attendees.filter((b:any) => b.checkedIn).length} <span className="text-on-surface-variant/40 text-sm font-medium">Synced</span>
+               {attendees.filter((b:any) => !!b.checkedInAt).length} <span className="text-on-surface-variant/40 text-sm font-medium">Synced</span>
              </h3>
-             <p className="text-[10px] text-on-surface-variant/40 font-bold uppercase tracking-widest">Real-time gate feed</p>
-           </div>
-        </div>
-
-        {/* Content Tabs / Description */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
-            <div className="lg:col-span-8 space-y-8">
-                <section className="bg-surface-container-lowest p-10 rounded-[3rem] border border-outline-variant/10">
-                    <h2 className="text-2xl font-black text-on-surface font-headline mb-6 italic">Event Objective</h2>
-                    <p className="text-on-surface-variant font-medium leading-relaxed font-body whitespace-pre-wrap italic">
-                        {event.description || "The strategic directives for this event have not been documented in the summary field."}
-                    </p>
-                </section>
+              <p className="text-[10px] text-on-surface-variant/40 font-bold uppercase tracking-widest">Real-time gate feed</p>
             </div>
+         </div>
 
-            <div className="lg:col-span-4 space-y-8">
-                <section className="bg-surface-container-low p-8 rounded-[2.5rem] border border-outline-variant/10">
-                    <h2 className="text-sm font-black text-on-surface font-headline mb-6 uppercase tracking-widest italic flex items-center gap-2">
-                        <span className="material-symbols-outlined text-sm text-primary">analytics</span>
-                        Executive Summary
-                    </h2>
-                    <div className="space-y-6">
-                        <div className="flex justify-between items-center text-sm">
-                            <span className="text-on-surface-variant font-medium">Creation Date</span>
-                            <span className="font-bold text-on-surface italic">{new Date(event.createdAt).toLocaleDateString()}</span>
-                        </div>
-                        <div className="flex justify-between items-center text-sm">
-                            <span className="text-on-surface-variant font-medium">Last Modified</span>
-                            <span className="font-bold text-on-surface italic">{new Date(event.updatedAt).toLocaleDateString()}</span>
-                        </div>
-                        <div className="flex justify-between items-center text-sm">
-                            <span className="text-on-surface-variant font-medium">Pricing Model</span>
-                            <span className="font-bold text-on-surface italic capitalize">{event.accessModel} RSVP</span>
-                        </div>
-                    </div>
-                </section>
-            </div>
-        </div>
+         {/* Granular Event Analytics */}
+         <EventAnalyticsCharts attendees={attendees} />
+
+         {/* Content Tabs / Description */}
+         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
+             <div className="lg:col-span-8 space-y-8">
+                 <section className="bg-surface-container-lowest p-10 rounded-[3rem] border border-outline-variant/10">
+                     <h2 className="text-2xl font-black text-on-surface font-headline mb-6 italic">Event Objective</h2>
+                     <p className="text-on-surface-variant font-medium leading-relaxed font-body whitespace-pre-wrap italic">
+                         {event.description || "The strategic directives for this event have not been documented in the summary field."}
+                     </p>
+                 </section>
+             </div>
+
+             <div className="lg:col-span-4 space-y-8">
+                 <section className="bg-surface-container-low p-8 rounded-[2.5rem] border border-outline-variant/10">
+                     <h2 className="text-sm font-black text-on-surface font-headline mb-6 uppercase tracking-widest italic flex items-center gap-2">
+                         <span className="material-symbols-outlined text-sm text-primary">analytics</span>
+                         Executive Summary
+                     </h2>
+                     <div className="space-y-6">
+                         <div className="flex justify-between items-center text-sm">
+                             <span className="text-on-surface-variant font-medium">Creation Date</span>
+                             <span className="font-bold text-on-surface italic">{new Date(event.createdAt).toLocaleDateString()}</span>
+                         </div>
+                         <div className="flex justify-between items-center text-sm">
+                             <span className="text-on-surface-variant font-medium">Last Modified</span>
+                             <span className="font-bold text-on-surface italic">{new Date(event.updatedAt).toLocaleDateString()}</span>
+                         </div>
+                         <div className="flex justify-between items-center text-sm">
+                             <span className="text-on-surface-variant font-medium">Pricing Model</span>
+                             <span className="font-bold text-on-surface italic capitalize">{event.accessModel} RSVP</span>
+                         </div>
+                     </div>
+                 </section>
+
+                 <section className="bg-surface-container-low p-8 rounded-[2.5rem] border border-outline-variant/10 space-y-6">
+                     <h2 className="text-sm font-black text-on-surface font-headline uppercase tracking-widest italic flex items-center gap-2">
+                         <span className="material-symbols-outlined text-sm text-secondary">badge</span>
+                         Staffing Ratios
+                     </h2>
+                     <div className="space-y-5">
+                       {event.staffRolesNeeded && event.staffRolesNeeded.length > 0 ? (
+                         event.staffRolesNeeded.map((role: any) => {
+                           const assignedCount = role.assignedStaff?.filter((s: any) => !!s).length || 0;
+                           const totalCount = role.count || 0;
+                           const fillRate = totalCount > 0 ? (assignedCount / totalCount) * 100 : 0;
+                           
+                           let progressColor = 'bg-error';
+                           if (fillRate === 100) progressColor = 'bg-primary';
+                           else if (fillRate >= 50) progressColor = 'bg-secondary';
+                           
+                           return (
+                             <div key={role.roleName} className="space-y-2">
+                               <div className="flex justify-between items-center text-xs">
+                                 <span className="font-bold text-on-surface uppercase tracking-wide">{role.roleName}</span>
+                                 <span className="font-mono text-on-surface-variant font-semibold">
+                                   {assignedCount} / {totalCount}
+                                 </span>
+                               </div>
+                               <div className="w-full bg-outline-variant/10 h-2 rounded-full overflow-hidden">
+                                 <div className={`h-full ${progressColor} transition-all duration-500`} style={{ width: `${fillRate}%` }} />
+                               </div>
+                             </div>
+                           );
+                         })
+                       ) : (
+                         <p className="text-xs text-on-surface-variant italic opacity-60">No staff roles specified for this event.</p>
+                       )}
+                     </div>
+                 </section>
+             </div>
+         </div>
       </div>
     </div>
   );
