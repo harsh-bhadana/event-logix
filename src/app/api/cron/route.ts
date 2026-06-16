@@ -4,7 +4,13 @@ import Event from "@/models/Event";
 import Booking from "@/models/Booking";
 import { createNotification } from "@/lib/actions/notification-actions";
 
-export async function GET() {
+export async function GET(request: Request) {
+  // Check authorization in production environments
+  const authHeader = request.headers.get("authorization");
+  if (process.env.CRON_SECRET && authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
+    return new Response("Unauthorized", { status: 401 });
+  }
+
   try {
     await dbConnect();
 

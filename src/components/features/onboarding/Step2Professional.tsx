@@ -1,10 +1,48 @@
 "use client";
 
-import React from "react";
+import React, { useRef, useState } from "react";
 import { useStaffOnboarding } from "@/hooks/useStaffOnboarding";
+import { toast } from "sonner";
 
 export default function Step2Professional() {
   const { data, updateData, setCurrentStep } = useStaffOnboarding();
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [isUploading, setIsUploading] = useState(false);
+
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Validate size (max 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error("Image file size must be less than 5MB");
+      return;
+    }
+
+    setIsUploading(true);
+    const formData = new FormData();
+    formData.append("file", file);
+
+    try {
+      const res = await fetch("/api/upload", {
+        method: "POST",
+        body: formData,
+      });
+
+      const result = await res.json();
+      if (result.success && result.url) {
+        updateData({ profileImage: result.url });
+        toast.success("Profile photo uploaded successfully!");
+      } else {
+        toast.error(result.error || "Failed to upload profile photo.");
+      }
+    } catch (err) {
+      console.error(err);
+      toast.error("An error occurred during upload.");
+    } finally {
+      setIsUploading(false);
+    }
+  };
 
   return (
     <div className="space-y-12 animate-in fade-in slide-in-from-right-4 duration-500">
@@ -17,9 +55,25 @@ export default function Step2Professional() {
         {/* Profile Identity Section */}
         <div className="lg:col-span-4 space-y-8">
           <div className="bg-surface-container-lowest p-8 rounded-xl flex flex-col items-center text-center border border-outline-variant/10">
-            <div className="relative group">
-              <div className="w-32 h-32 rounded-full bg-surface-container-highest flex items-center justify-center border-2 border-dashed border-outline-variant hover:border-primary transition-colors cursor-pointer overflow-hidden">
-                <span className="material-symbols-outlined text-4xl text-outline-variant group-hover:text-primary">add_a_photo</span>
+            <input
+              type="file"
+              ref={fileInputRef}
+              onChange={handleFileChange}
+              accept="image/*"
+              className="hidden"
+            />
+            <div 
+              onClick={() => !isUploading && fileInputRef.current?.click()}
+              className="relative group cursor-pointer"
+            >
+              <div className="w-32 h-32 rounded-full bg-surface-container-highest flex items-center justify-center border-2 border-dashed border-outline-variant hover:border-primary transition-colors overflow-hidden">
+                {isUploading ? (
+                  <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
+                ) : data.profileImage ? (
+                  <img src={data.profileImage} alt="Profile headshot" className="w-full h-full object-cover" />
+                ) : (
+                  <span className="material-symbols-outlined text-4xl text-outline-variant group-hover:text-primary">add_a_photo</span>
+                )}
               </div>
               <div className="absolute bottom-0 right-0 p-2 bg-primary text-on-primary rounded-full shadow-lg">
                 <span className="material-symbols-outlined text-sm">edit</span>

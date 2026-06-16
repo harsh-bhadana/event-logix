@@ -1,9 +1,48 @@
 "use client";
 
 import { useWizard } from "@/hooks/useEventWizard";
+import { useRef, useState } from "react";
+import { toast } from "sonner";
 
 export function Step1BasicInfo() {
   const { data, updateData } = useWizard();
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [isUploading, setIsUploading] = useState(false);
+
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Validate size (max 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error("Image file size must be less than 5MB");
+      return;
+    }
+
+    setIsUploading(true);
+    const formData = new FormData();
+    formData.append("file", file);
+
+    try {
+      const res = await fetch("/api/upload", {
+        method: "POST",
+        body: formData,
+      });
+
+      const result = await res.json();
+      if (result.success && result.url) {
+        updateData({ bannerImage: result.url });
+        toast.success("Banner uploaded successfully!");
+      } else {
+        toast.error(result.error || "Failed to upload image.");
+      }
+    } catch (err) {
+      console.error(err);
+      toast.error("An error occurred while uploading.");
+    } finally {
+      setIsUploading(false);
+    }
+  };
 
   return (
     <div className="max-w-4xl mx-auto px-12 py-10 animate-fade-in">
@@ -82,9 +121,29 @@ export function Step1BasicInfo() {
         <div className="col-span-12 lg:col-span-5 space-y-6">
           <div className="space-y-2">
             <label className="font-label font-bold text-sm text-on-surface-variant ml-1">Event Banner</label>
-            <div className="aspect-[4/5] w-full bg-surface-container-low rounded-xl flex flex-col items-center justify-center p-8 text-center border-2 border-dashed border-outline-variant/20 hover:border-primary/40 hover:bg-white transition-all cursor-pointer group relative overflow-hidden">
-              {data.bannerImage ? (
-                <img src={data.bannerImage} className="absolute inset-0 w-full h-full object-cover" alt="Banner Preview" />
+            <input
+              type="file"
+              ref={fileInputRef}
+              onChange={handleFileChange}
+              accept="image/*"
+              className="hidden"
+            />
+            <div
+              onClick={() => !isUploading && fileInputRef.current?.click()}
+              className="aspect-[4/5] w-full bg-surface-container-low rounded-xl flex flex-col items-center justify-center p-8 text-center border-2 border-dashed border-outline-variant/20 hover:border-primary/40 hover:bg-white transition-all cursor-pointer group relative overflow-hidden"
+            >
+              {isUploading ? (
+                <div className="flex flex-col items-center gap-2">
+                  <div className="w-10 h-10 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
+                  <p className="font-body text-xs text-primary font-semibold">Uploading to secure storage...</p>
+                </div>
+              ) : data.bannerImage ? (
+                <div className="relative w-full h-full group/image">
+                  <img src={data.bannerImage} className="absolute inset-0 w-full h-full object-cover" alt="Banner Preview" />
+                  <div className="absolute inset-0 bg-black/40 opacity-0 group-hover/image:opacity-100 transition-opacity flex items-center justify-center">
+                    <span className="text-white text-xs font-semibold bg-primary px-3 py-1.5 rounded-full shadow">Change Banner</span>
+                  </div>
+                </div>
               ) : (
                 <>
                   <div className="w-16 h-16 rounded-full bg-primary-container flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">

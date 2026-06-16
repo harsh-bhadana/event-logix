@@ -1,10 +1,8 @@
 import mongoose from "mongoose";
 
-const MONGODB_URI = process.env.MONGODB_URI;
+import { env } from "@/lib/env";
 
-if (!MONGODB_URI) {
-  throw new Error("Please define the MONGODB_URI environment variable inside .env.local");
-}
+const MONGODB_URI = env.MONGODB_URI;
 
 /**
  * Global is used here to maintain a cached connection across hot reloads

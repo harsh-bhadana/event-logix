@@ -1,9 +1,10 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { useStaffOnboarding } from "@/hooks/useStaffOnboarding";
 import { registerStaff } from "@/lib/actions/auth-actions";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 
 const DAYS = [
   { id: "monday", label: "Mon" },
@@ -18,8 +19,10 @@ const DAYS = [
 export default function Step4VerificationAvailability() {
   const { data, updateData, setCurrentStep } = useStaffOnboarding();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
   const [shortNotice, setShortNotice] = useState(true);
   const [remotePreferred, setRemotePreferred] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
 
   const toggleDay = (day: string) => {
@@ -31,19 +34,56 @@ export default function Step4VerificationAvailability() {
     });
   };
 
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Validate size (max 10MB)
+    if (file.size > 10 * 1024 * 1024) {
+      toast.error("Document file size must be less than 10MB");
+      return;
+    }
+
+    setIsUploading(true);
+    const formData = new FormData();
+    formData.append("file", file);
+
+    try {
+      const res = await fetch("/api/upload", {
+        method: "POST",
+        body: formData,
+      });
+
+      const result = await res.json();
+      if (result.success && result.url) {
+        updateData({
+          verificationDocs: [...(data.verificationDocs || []), result.url],
+        });
+        toast.success(`${file.name} uploaded successfully!`);
+      } else {
+        toast.error(result.error || "Failed to upload document.");
+      }
+    } catch (err) {
+      console.error(err);
+      toast.error("An error occurred during upload.");
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
   const handleSubmit = async () => {
     setIsSubmitting(true);
     try {
       const result = await registerStaff(data);
       if (result.success) {
-        alert(result.message);
-        router.push("/");
+        toast.success(result.message);
+        router.push("/login");
       } else {
-        alert(result.message);
+        toast.error(result.message);
       }
     } catch (error) {
       console.error(error);
-      alert("Something went wrong. Please try again.");
+      toast.error("Something went wrong. Please try again.");
     } finally {
       setIsSubmitting(false);
     }
@@ -61,18 +101,77 @@ export default function Step4VerificationAvailability() {
           <span className="material-symbols-outlined text-primary text-4xl opacity-20">security</span>
         </header>
         <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
-          <div className="md:col-span-8 group relative flex flex-col items-center justify-center border-2 border-dashed border-outline-variant bg-surface-container-lowest rounded-xl p-12 transition-all hover:border-primary hover:bg-primary/5 cursor-pointer">
-            <div className="bg-primary-container p-4 rounded-full mb-4 group-hover:scale-110 transition-transform">
-              <span className="material-symbols-outlined text-primary text-3xl">upload_file</span>
+          <div className="md:col-span-8 flex flex-col">
+            <input
+              type="file"
+              ref={fileInputRef}
+              onChange={handleFileChange}
+              accept=".pdf,image/*"
+              className="hidden"
+            />
+            <div 
+              onClick={() => !isUploading && fileInputRef.current?.click()}
+              className="group relative flex flex-col items-center justify-center border-2 border-dashed border-outline-variant bg-surface-container-lowest rounded-xl p-12 transition-all hover:border-primary hover:bg-primary/5 cursor-pointer min-h-[220px]"
+            >
+              {isUploading ? (
+                <div className="flex flex-col items-center gap-2">
+                  <div className="w-10 h-10 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
+                  <p className="font-body text-xs text-primary font-semibold">Uploading document...</p>
+                </div>
+              ) : (
+                <>
+                  <div className="bg-primary-container p-4 rounded-full mb-4 group-hover:scale-110 transition-transform">
+                    <span className="material-symbols-outlined text-primary text-3xl">upload_file</span>
+                  </div>
+                  <h4 className="font-headline font-semibold text-lg text-on-surface mb-1">Upload Identification / Resume</h4>
+                  <p className="text-on-surface-variant text-sm text-center max-w-xs font-body">
+                    Click here to <span className="text-primary font-bold">browse your files</span>
+                  </p>
+                  <p className="text-[10px] text-outline mt-6 uppercase tracking-widest font-bold">Supported: PDF, JPG, PNG (Max 10MB)</p>
+                </>
+              )}
             </div>
-            <h4 className="font-headline font-semibold text-lg text-on-surface mb-1">Identity Verification</h4>
-            <p className="text-on-surface-variant text-sm text-center max-w-xs font-body">
-              Drag and drop your Government ID or Resume here, or <span className="text-primary font-bold">browse files</span>
-            </p>
-            <p className="text-[10px] text-outline mt-6 uppercase tracking-widest font-bold">Supported: PDF, JPG, PNG (Max 10MB)</p>
+
+            {/* Uploaded Documents List */}
+            {data.verificationDocs && data.verificationDocs.length > 0 && (
+              <div className="mt-6 space-y-3">
+                <h5 className="text-xs font-bold text-on-surface-variant uppercase tracking-wider">Uploaded Documents</h5>
+                <div className="grid grid-cols-1 gap-2">
+                  {data.verificationDocs.map((url, idx) => {
+                    const isBase64 = url.startsWith("data:");
+                    const filename = isBase64 
+                      ? `document_${idx + 1}.${url.split(";")[0].split("/")[1] || "pdf"}`
+                      : url.substring(url.lastIndexOf('/') + 1);
+
+                    return (
+                      <div key={idx} className="flex items-center justify-between p-3 bg-surface-container-low rounded-lg border border-outline-variant/10 animate-in fade-in duration-300">
+                        <div className="flex items-center gap-2 max-w-[80%]">
+                          <span className="material-symbols-outlined text-primary text-sm">description</span>
+                          <a href={url} target="_blank" rel="noopener noreferrer" className="text-xs text-primary font-medium hover:underline truncate">
+                            {filename}
+                          </a>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            const updated = data.verificationDocs.filter((_, i) => i !== idx);
+                            updateData({ verificationDocs: updated });
+                            toast.success("Document removed.");
+                          }}
+                          className="text-xs text-error font-semibold hover:text-error/80 cursor-pointer"
+                        >
+                          Remove
+                        </button>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
           </div>
           <div className="md:col-span-4 space-y-4">
-            <div className="bg-surface-container-low p-6 rounded-xl border border-outline-variant/10">
+            <div className="bg-surface-container-low p-6 rounded-xl border border-outline-variant/10 h-fit">
               <span className="material-symbols-outlined text-primary mb-3">info</span>
               <h5 className="font-bold text-sm text-on-surface mb-2">Why is this required?</h5>
               <p className="text-xs text-on-surface-variant leading-relaxed">
