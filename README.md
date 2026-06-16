@@ -133,11 +133,21 @@ npm run dev
 | Command | Action |
 |---------|--------|
 | `npm run dev` | Spins up the local development environment |
-| `npm run build` | Compiles for production (Self-checks for type safety) |
-| `npm run lint` | Runs the linter suite to ensure code health |
-| `npx tsc --noEmit` | Deep type-validation across the entire tree |
+| `npm run build` | Compiles for production (Self-checks for type safety and rules) |
+| `npx eslint .` | Runs the lint formatter to audit style quality |
+| `npx tsc --noEmit` | Deep type-validation across the TypeScript tree |
+| `npx vitest run` | Runs the automated unit test suite |
+
+---
+
+## 📚 Technical Documentation
+
+Explore the detailed architecture and setup instructions:
+- [System Architecture](file:///g:/Projects/event-logix/docs/architecture.md) – App routing, JWT authentication middleware, and database relational mappings.
+- [Deployment & Secrets Config](file:///g:/Projects/event-logix/docs/deployment.md) – Vercel hosting, MongoDB connection, and Blob/Cron details.
+- [Testing Standards](file:///g:/Projects/event-logix/docs/testing.md) – Vitest runner instructions and unit testing mock templates.
 
 ---
 
 ## 📄 License
- Event Logix
+Event Logix
