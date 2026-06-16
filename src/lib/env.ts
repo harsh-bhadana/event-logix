@@ -9,9 +9,22 @@ const envSchema = z.object({
 
 // Validate process.env on startup
 const parseEnv = () => {
+  const isBuildTime = 
+    process.env.NEXT_PHASE === "phase-production-build" || 
+    process.env.SKIP_ENV_VALIDATION === "true";
+
   const result = envSchema.safeParse(process.env);
 
   if (!result.success) {
+    if (isBuildTime) {
+      console.warn("⚠️ Warning: Missing environment variables during build phase (bypassed):");
+      // Return placeholders so Next.js static optimization does not crash
+      return {
+        MONGODB_URI: "mongodb://localhost:27017/showcase-placeholder",
+        JWT_SECRET: "placeholder-jwt-secret-must-be-long-enough-to-be-secure",
+      } as any;
+    }
+
     console.error("❌ Invalid environment configuration:");
     console.error(JSON.stringify(result.error.format(), null, 2));
     throw new Error("Invalid environment configuration. Check logs for details.");
