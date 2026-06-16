@@ -5,6 +5,9 @@ const envSchema = z.object({
   JWT_SECRET: z.string().min(1, "JWT_SECRET is required"),
   CRON_SECRET: z.string().optional(),
   BLOB_READ_WRITE_TOKEN: z.string().optional(),
+  GOOGLE_CLIENT_ID: z.string().optional(),
+  GOOGLE_CLIENT_SECRET: z.string().optional(),
+  NEXT_PUBLIC_APP_URL: z.string().optional(),
 });
 
 // Validate process.env on startup
