@@ -6,7 +6,11 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "seed": "npx tsx scripts/seed-db.ts",
+    "test-flows": "npx tsx scripts/test-flows.ts",
+    "test": "npx vitest run",
+    "prepare": "husky"
   },
   "dependencies": {
     "@vercel/blob": "^2.4.0",
@@ -38,9 +42,21 @@
     "@vitejs/plugin-react": "^6.0.1",
     "eslint": "^9",
     "eslint-config-next": "16.1.6",
+    "husky": "^9.1.7",
     "jsdom": "^29.0.1",
+    "lint-staged": "^17.0.7",
+    "prettier": "^3.8.4",
     "tailwindcss": "^4",
     "typescript": "^5",
     "vitest": "^4.1.1"
+  },
+  "lint-staged": {
+    "*.{js,jsx,ts,tsx}": [
+      "prettier --write",
+      "eslint --fix"
+    ],
+    "*.{json,css,md}": [
+      "prettier --write"
+    ]
   }
 }

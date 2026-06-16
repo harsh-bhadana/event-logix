@@ -1,7 +1,12 @@
 import { z } from "zod";
 
 const envSchema = z.object({
-  MONGODB_URI: z.string().min(1, "MONGODB_URI is required").url("MONGODB_URI must be a valid URL"),
+  MONGODB_URI: z
+    .string()
+    .min(1, "MONGODB_URI is required")
+    .refine((val) => val.startsWith("mongodb://") || val.startsWith("mongodb+srv://"), {
+      message: "MONGODB_URI must start with mongodb:// or mongodb+srv://",
+    }),
   JWT_SECRET: z.string().min(1, "JWT_SECRET is required"),
   CRON_SECRET: z.string().optional(),
   BLOB_READ_WRITE_TOKEN: z.string().optional(),
@@ -12,8 +17,8 @@ const envSchema = z.object({
 
 // Validate process.env on startup
 const parseEnv = () => {
-  const isBuildTime = 
-    process.env.NEXT_PHASE === "phase-production-build" || 
+  const isBuildTime =
+    process.env.NEXT_PHASE === "phase-production-build" ||
     process.env.SKIP_ENV_VALIDATION === "true";
 
   const result = envSchema.safeParse(process.env);
