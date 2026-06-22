@@ -13,7 +13,6 @@
     "prepare": "husky"
   },
 
-
   "dependencies": {
     "@vercel/blob": "^2.4.0",
     "bcryptjs": "^3.0.3",
