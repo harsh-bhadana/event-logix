@@ -3,7 +3,7 @@ import dbConnect from "@/lib/mongodb";
 import Event, { IEvent } from "@/models/Event";
 import Booking from "@/models/Booking";
 import { WizardData } from "@/hooks/useEventWizard";
-import { revalidatePath } from "next/cache";
+import { revalidatePath, unstable_cache } from "next/cache";
 
 export async function publishEvent(data: WizardData) {
   try {
@@ -14,7 +14,13 @@ export async function publishEvent(data: WizardData) {
     const ticketTypes =
       data.accessModel === "free"
         ? [{ name: "General Admission", price: 0, quantity: parseInt(data.totalQuantity, 10) || 0 }]
-        : [{ name: "Standard", price: parseFloat(data.ticketPrice) || 0, quantity: parseInt(data.totalQuantity, 10) || 0 }];
+        : [
+            {
+              name: "Standard",
+              price: parseFloat(data.ticketPrice) || 0,
+              quantity: parseInt(data.totalQuantity, 10) || 0,
+            },
+          ];
 
     const eventDate = new Date(data.date);
     if (isNaN(eventDate.getTime()) || eventDate.getFullYear() > 2100) {
@@ -70,43 +76,43 @@ export async function publishEvent(data: WizardData) {
 export async function getStaffOpportunities(filters?: { dateRange?: string; expertise?: string }) {
   try {
     await dbConnect();
-    
-    const query: any = { status: 'published' };
-    
+
+    const query: any = { status: "published" };
+
     const now = new Date();
-    
-    if (filters?.dateRange === 'This Week') {
+
+    if (filters?.dateRange === "This Week") {
       const endOfWeek = new Date();
       endOfWeek.setDate(now.getDate() + 7);
       query.date = { $gte: now, $lte: endOfWeek };
-    } else if (filters?.dateRange === 'Next Month') {
-       const startOfMonth = new Date();
-       startOfMonth.setMonth(now.getMonth() + 1);
-       startOfMonth.setDate(1);
-       const endOfMonth = new Date(startOfMonth);
-       endOfMonth.setMonth(endOfMonth.getMonth() + 1);
-       endOfMonth.setDate(0);
-       query.date = { $gte: startOfMonth, $lte: endOfMonth };
+    } else if (filters?.dateRange === "Next Month") {
+      const startOfMonth = new Date();
+      startOfMonth.setMonth(now.getMonth() + 1);
+      startOfMonth.setDate(1);
+      const endOfMonth = new Date(startOfMonth);
+      endOfMonth.setMonth(endOfMonth.getMonth() + 1);
+      endOfMonth.setDate(0);
+      query.date = { $gte: startOfMonth, $lte: endOfMonth };
     }
 
     const events = await Event.find(query).sort({ date: 1 }).lean();
-    
+
     // Filter events that have at least one open slot
     const opportunities = events.filter((event: any) => {
-      const openRoles = (event.staffRolesNeeded || []).filter((role: any) => 
-        (role.assignedStaff?.length || 0) < role.count
+      const openRoles = (event.staffRolesNeeded || []).filter(
+        (role: any) => (role.assignedStaff?.length || 0) < role.count
       );
-      
+
       if (openRoles.length === 0) return false;
-      
+
       // Filter by expertise if provided
-      if (filters?.expertise && filters.expertise !== 'All Roles') {
-        const matchesExpertise = openRoles.some((role: any) => 
+      if (filters?.expertise && filters.expertise !== "All Roles") {
+        const matchesExpertise = openRoles.some((role: any) =>
           role.roleName.toLowerCase().includes(filters.expertise!.toLowerCase())
         );
         if (!matchesExpertise) return false;
       }
-      
+
       return true;
     });
 
@@ -116,35 +122,35 @@ export async function getStaffOpportunities(filters?: { dateRange?: string; expe
     };
   } catch (error: any) {
     console.error("Error fetching staff opportunities:", error);
-    return { 
-      success: false, 
+    return {
+      success: false,
       error: error.message || "Failed to fetch opportunities",
-      data: [] 
+      data: [],
     };
   }
 }
 
-export async function getAdminEvents(filters?: { 
-  search?: string; 
-  status?: string; 
+export async function getAdminEvents(filters?: {
+  search?: string;
+  status?: string;
   category?: string;
   startDate?: string;
   endDate?: string;
-  page?: number 
+  page?: number;
 }) {
   try {
     await dbConnect();
-    
+
     const query: any = {};
-    
-    if (filters?.status && filters.status !== 'All Events') {
+
+    if (filters?.status && filters.status !== "All Events") {
       const statusLower = filters.status.toLowerCase();
-      if (['draft', 'published', 'completed', 'cancelled', 'archived'].includes(statusLower)) {
+      if (["draft", "published", "completed", "cancelled", "archived"].includes(statusLower)) {
         query.status = statusLower;
       }
     }
 
-    if (filters?.category && filters.category !== 'All Categories') {
+    if (filters?.category && filters.category !== "All Categories") {
       query.category = filters.category;
     }
 
@@ -157,11 +163,11 @@ export async function getAdminEvents(filters?: {
         query.date.$lte = new Date(filters.endDate);
       }
     }
-    
+
     if (filters?.search) {
       query.$or = [
-        { title: { $regex: filters.search, $options: 'i' } },
-        { locationName: { $regex: filters.search, $options: 'i' } }
+        { title: { $regex: filters.search, $options: "i" } },
+        { locationName: { $regex: filters.search, $options: "i" } },
       ];
     }
 
@@ -170,85 +176,101 @@ export async function getAdminEvents(filters?: {
     const skip = (page - 1) * limit;
 
     const total = await Event.countDocuments(query);
-    const events = await Event.find(query)
-      .sort({ date: -1 })
-      .skip(skip)
-      .limit(limit)
-      .lean();
+    const events = await Event.find(query).sort({ date: -1 }).skip(skip).limit(limit).lean();
 
     // Enhance events with booking data manually since we used lean()
-    const enhancedEvents = await Promise.all(events.map(async (event: any) => {
-      const bookingsCount = await Booking.countDocuments({ 
-        event: event._id,
-        paymentStatus: 'completed'
-      });
-      
-      const totalTickets = (event.ticketTypes || []).reduce((acc: number, type: any) => acc + (type.quantity || 0), 0);
-      
-      const staffFilled = (event.staffRolesNeeded || []).reduce((acc: number, role: any) => acc + (role.assignedStaff?.length || 0), 0);
-      const totalStaff = (event.staffRolesNeeded || []).reduce((acc: number, role: any) => acc + (role.count || 0), 0);
+    const enhancedEvents = await Promise.all(
+      events.map(async (event: any) => {
+        const bookingsCount = await Booking.countDocuments({
+          event: event._id,
+          paymentStatus: "completed",
+        });
 
-      return {
-        ...event,
-        bookingsCount,
-        totalTickets,
-        staffFilled,
-        totalStaff
-      };
-    }));
+        const totalTickets = (event.ticketTypes || []).reduce(
+          (acc: number, type: any) => acc + (type.quantity || 0),
+          0
+        );
+
+        const staffFilled = (event.staffRolesNeeded || []).reduce(
+          (acc: number, role: any) => acc + (role.assignedStaff?.length || 0),
+          0
+        );
+        const totalStaff = (event.staffRolesNeeded || []).reduce(
+          (acc: number, role: any) => acc + (role.count || 0),
+          0
+        );
+
+        return {
+          ...event,
+          bookingsCount,
+          totalTickets,
+          staffFilled,
+          totalStaff,
+        };
+      })
+    );
 
     return {
       success: true,
       data: JSON.parse(JSON.stringify(enhancedEvents)),
       total,
       page,
-      pages: Math.ceil(total / limit)
+      pages: Math.ceil(total / limit),
     };
   } catch (error: any) {
     console.error("Error fetching admin events:", error);
-    return { 
-      success: false, 
+    return {
+      success: false,
       error: error.message || "Failed to fetch events",
       data: [],
       total: 0,
       page: 1,
-      pages: 1
+      pages: 1,
     };
   }
 }
 
-export async function getFeaturedEvents() {
-  try {
-    await dbConnect();
-    const events = await Event.find({ isFeatured: true, status: 'published' })
-      .sort({ date: 1 })
-      .limit(6)
-      .lean();
-    
-    // Enhance with booking and ticket info
-    const enhancedEvents = await Promise.all(events.map(async (event: any) => {
-      const bookingsCount = await Booking.countDocuments({ 
-        event: event._id,
-        paymentStatus: 'completed'
-      });
-      const totalTickets = (event.ticketTypes || []).reduce((acc: number, type: any) => acc + (type.quantity || 0), 0);
-      
+export const getFeaturedEvents = unstable_cache(
+  async () => {
+    try {
+      await dbConnect();
+      const events = await Event.find({ isFeatured: true, status: "published" })
+        .sort({ date: 1 })
+        .limit(6)
+        .lean();
+
+      // Enhance with booking and ticket info
+      const enhancedEvents = await Promise.all(
+        events.map(async (event: any) => {
+          const bookingsCount = await Booking.countDocuments({
+            event: event._id,
+            paymentStatus: "completed",
+          });
+          const totalTickets = (event.ticketTypes || []).reduce(
+            (acc: number, type: any) => acc + (type.quantity || 0),
+            0
+          );
+
+          return {
+            ...event,
+            bookingsCount,
+            totalTickets,
+          };
+        })
+      );
+
       return {
-        ...event,
-        bookingsCount,
-        totalTickets
+        success: true,
+        data: JSON.parse(JSON.stringify(enhancedEvents)),
       };
-    }));
-
-    return {
-      success: true,
-      data: JSON.parse(JSON.stringify(enhancedEvents))
-    };
-  } catch (error: any) {
-    console.error("Error fetching featured events:", error);
-    return { success: false, data: [] };
-  }
-}
+    } catch (error: any) {
+      console.error("Error fetching featured events:", error);
+      return { success: false, data: [] };
+    }
+  },
+  ["featured-events"],
+  { revalidate: 3600, tags: ["events"] }
+);
 
 export async function getEventById(id: string) {
   try {
@@ -258,7 +280,7 @@ export async function getEventById(id: string) {
 
     return {
       success: true,
-      data: JSON.parse(JSON.stringify(event))
+      data: JSON.parse(JSON.stringify(event)),
     };
   } catch (error: any) {
     console.error("Error fetching event by ID:", error);
