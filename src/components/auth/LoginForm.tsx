@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import { useState, useEffect } from "react";
 import { login } from "@/lib/actions/auth-actions";
@@ -26,20 +26,7 @@ export default function LoginForm() {
     const formData = new FormData(event.currentTarget);
     const result = await login(formData);
 
-    if (result.success) {
-      // Redirect based on role
-      switch (result.role) {
-        case 'admin':
-          router.push("/admin");
-          break;
-        case 'staff':
-          router.push("/staff/jobs");
-          break;
-        default:
-          router.push("/");
-          break;
-      }
-    } else {
+    if (result && !result.success) {
       setError(result.message || "Login failed");
       setLoading(false);
     }
@@ -48,9 +35,13 @@ export default function LoginForm() {
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
       <div className="space-y-2">
-        <label className="text-xs font-bold text-on-surface-variant uppercase tracking-widest ml-1">Email Address</label>
+        <label className="text-xs font-bold text-on-surface-variant uppercase tracking-widest ml-1">
+          Email Address
+        </label>
         <div className="relative group">
-          <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant group-focus-within:text-primary transition-colors">mail</span>
+          <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant group-focus-within:text-primary transition-colors">
+            mail
+          </span>
           <input
             name="email"
             type="email"
@@ -63,13 +54,20 @@ export default function LoginForm() {
 
       <div className="space-y-2">
         <div className="flex justify-between items-center ml-1">
-          <label className="text-xs font-bold text-on-surface-variant uppercase tracking-widest">Password</label>
-          <Link href="/forgot-password" className="text-[10px] font-bold text-primary hover:text-primary-dim uppercase tracking-wider transition-colors">
+          <label className="text-xs font-bold text-on-surface-variant uppercase tracking-widest">
+            Password
+          </label>
+          <Link
+            href="/forgot-password"
+            className="text-[10px] font-bold text-primary hover:text-primary-dim uppercase tracking-wider transition-colors"
+          >
             Forgot Password?
           </Link>
         </div>
         <div className="relative group">
-          <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant group-focus-within:text-primary transition-colors">lock</span>
+          <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant group-focus-within:text-primary transition-colors">
+            lock
+          </span>
           <input
             name="password"
             type="password"
@@ -97,14 +95,18 @@ export default function LoginForm() {
         ) : (
           <>
             Sign In to Portfolio
-            <span className="material-symbols-outlined text-lg group-hover:translate-x-1 transition-transform">arrow_forward</span>
+            <span className="material-symbols-outlined text-lg group-hover:translate-x-1 transition-transform">
+              arrow_forward
+            </span>
           </>
         )}
       </button>
 
       <div className="flex items-center my-4">
         <div className="flex-grow border-t border-outline-variant/10"></div>
-        <span className="mx-3 text-[10px] font-bold text-on-surface-variant/40 uppercase tracking-widest">or</span>
+        <span className="mx-3 text-[10px] font-bold text-on-surface-variant/40 uppercase tracking-widest">
+          or
+        </span>
         <div className="flex-grow border-t border-outline-variant/10"></div>
       </div>
 
@@ -135,7 +137,10 @@ export default function LoginForm() {
 
       <div className="pt-4 text-center text-[13px] font-medium text-on-surface-variant">
         Don&apos;t have an account?{" "}
-        <Link href="/signup" className="text-primary font-bold hover:text-primary-dim transition-colors">
+        <Link
+          href="/signup"
+          className="text-primary font-bold hover:text-primary-dim transition-colors"
+        >
           Create Account
         </Link>
       </div>

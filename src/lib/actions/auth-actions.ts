@@ -3,7 +3,8 @@
 import User from "@/models/User";
 import { StaffOnboardingData } from "@/hooks/useStaffOnboarding";
 import bcrypt from "bcryptjs";
-import { login_session, logout_session } from "@/lib/auth";
+import { signIn, signOut } from "@/auth";
+import { AuthError } from "next-auth";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import dbConnect from "@/lib/mongodb";
@@ -21,12 +22,12 @@ export async function registerStaff(data: StaffOnboardingData) {
 
     // Create new staff user
     const hashedPassword = await bcrypt.hash(data.password, 10);
-    
+
     const newUser = new User({
       name: data.name,
       email: data.email,
       password: hashedPassword,
-      role: 'staff',
+      role: "staff",
       staffProfile: {
         skills: data.skills,
         isVerified: false,
@@ -36,8 +37,8 @@ export async function registerStaff(data: StaffOnboardingData) {
         noticePeriod: data.noticePeriod,
         customTags: data.customTags,
         availability: data.availability,
-        verificationDocs: data.verificationDocs
-      }
+        verificationDocs: data.verificationDocs,
+      },
     });
 
     await newUser.save();
@@ -57,57 +58,22 @@ export async function registerStaff(data: StaffOnboardingData) {
 
 export async function login(formData: FormData) {
   try {
-    await dbConnect();
-    const email = formData.get("email") as string;
-    const password = formData.get("password") as string;
-
-    const user = await User.findOne({ email });
-    if (!user) {
-      return { success: false, message: "Invalid email or password" };
-    }
-
-    const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) {
-      if (user.role === 'admin') {
-        await logAdminAction({
-          action: "admin_login_failed",
-          targetType: "User",
-          targetId: user._id.toString(),
-          details: { email }
-        });
+    await signIn("credentials", formData, { redirectTo: "/" });
+  } catch (error) {
+    if (error instanceof AuthError) {
+      switch (error.type) {
+        case "CredentialsSignin":
+          return { success: false, message: "Invalid email or password" };
+        default:
+          return { success: false, message: "Something went wrong." };
       }
-      return { success: false, message: "Invalid email or password" };
     }
-
-    // Set session
-    await login_session({ 
-      id: user._id.toString(), 
-      email: user.email, 
-      role: user.role,
-      onboardingStatus: user.staffProfile?.onboardingStatus,
-      isVerified: user.staffProfile?.isVerified
-    });
-
-    if (user.role === 'admin') {
-      await logAdminAction({
-        action: "admin_login_success",
-        targetType: "User",
-        targetId: user._id.toString(),
-        details: { email }
-      });
-    }
-
-    return { success: true, role: user.role };
-  } catch (error: any) {
-    console.error("Login failed:", error);
-    return { success: false, message: "An error occurred during login" };
+    throw error;
   }
 }
 
 export async function logout() {
-  await logout_session();
-  revalidatePath("/");
-  redirect("/login");
+  await signOut();
 }
 
 export async function registerPublic(formData: FormData) {
@@ -127,7 +93,7 @@ export async function registerPublic(formData: FormData) {
       name,
       email,
       password: hashedPassword,
-      role: 'public'
+      role: "public",
     });
 
     await newUser.save();
