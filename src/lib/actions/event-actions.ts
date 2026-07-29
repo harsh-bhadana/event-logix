@@ -4,9 +4,34 @@ import Event, { IEvent } from "@/models/Event";
 import Booking from "@/models/Booking";
 import { WizardData } from "@/hooks/useEventWizard";
 import { revalidatePath, unstable_cache } from "next/cache";
+import { z } from "zod";
 
-export async function publishEvent(data: WizardData) {
+const EventSchema = z.object({
+  title: z.string().min(3, "Title must be at least 3 characters"),
+  description: z.string().min(10, "Description must be at least 10 characters"),
+  bannerImage: z.string().url().optional().nullable(),
+  category: z.string(),
+  date: z.string().refine((date) => !isNaN(Date.parse(date)), "Invalid date"),
+  accessModel: z.enum(["free", "paid"]),
+  ticketPrice: z.string().optional(),
+  totalQuantity: z.string(),
+  pricingStrategy: z.string().optional(),
+  taxInclusive: z.boolean().optional(),
+  showFeeBreakdown: z.boolean().optional(),
+  staffRoles: z
+    .array(
+      z.object({
+        name: z.string(),
+        headcount: z.number().min(1),
+      })
+    )
+    .optional()
+    .default([]),
+});
+
+export async function publishEvent(rawData: WizardData) {
   try {
+    const data = EventSchema.parse(rawData);
     console.log("Publishing event to MongoDB:", data.title);
     await dbConnect();
 
@@ -17,7 +42,7 @@ export async function publishEvent(data: WizardData) {
         : [
             {
               name: "Standard",
-              price: parseFloat(data.ticketPrice) || 0,
+              price: parseFloat(data.ticketPrice || "0") || 0,
               quantity: parseInt(data.totalQuantity, 10) || 0,
             },
           ];
