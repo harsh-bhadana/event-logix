@@ -5,6 +5,7 @@ declare module "next-auth" {
     user: {
       id: string;
       name: string;
+      email: string;
       role: string;
       onboardingStatus?: string;
       isVerified?: boolean;
@@ -13,6 +14,7 @@ declare module "next-auth" {
 
   interface User {
     name: string;
+    email: string;
     role: string;
     onboardingStatus?: string;
     isVerified?: boolean;
