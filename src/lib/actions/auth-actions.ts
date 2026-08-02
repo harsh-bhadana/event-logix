@@ -58,7 +58,9 @@ export async function registerStaff(data: StaffOnboardingData) {
 
 export async function login(formData: FormData) {
   try {
-    await signIn("credentials", formData, { redirectTo: "/" });
+    const email = formData.get("email") as string;
+    const password = formData.get("password") as string;
+    await signIn("credentials", { email, password, redirectTo: "/" });
   } catch (error) {
     if (error instanceof AuthError) {
       switch (error.type) {
