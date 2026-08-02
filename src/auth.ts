@@ -9,7 +9,7 @@ import { env } from "@/lib/env";
 
 export const { auth, signIn, signOut, handlers } = NextAuth({
   ...authConfig,
-  secret: env.JWT_SECRET,
+  secret: env.AUTH_SECRET,
   providers: [
     Google({
       clientId: env.GOOGLE_CLIENT_ID,

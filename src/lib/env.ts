@@ -7,7 +7,7 @@ const envSchema = z.object({
     .refine((val) => val.startsWith("mongodb://") || val.startsWith("mongodb+srv://"), {
       message: "MONGODB_URI must start with mongodb:// or mongodb+srv://",
     }),
-  JWT_SECRET: z.string().min(1, "JWT_SECRET is required"),
+  AUTH_SECRET: z.string().min(1, "AUTH_SECRET is required"),
   CRON_SECRET: z.string().optional(),
   BLOB_READ_WRITE_TOKEN: z.string().optional(),
   GOOGLE_CLIENT_ID: z.string().optional(),
@@ -29,7 +29,7 @@ const parseEnv = () => {
       // Return placeholders so Next.js static optimization does not crash
       return {
         MONGODB_URI: "mongodb://localhost:27017/showcase-placeholder",
-        JWT_SECRET: "placeholder-jwt-secret-must-be-long-enough-to-be-secure",
+        AUTH_SECRET: "placeholder-jwt-secret-must-be-long-enough-to-be-secure",
       } as any;
     }
 

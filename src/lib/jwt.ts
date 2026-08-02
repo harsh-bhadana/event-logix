@@ -2,7 +2,7 @@ import { SignJWT, jwtVerify } from "jose";
 
 import { env } from "@/lib/env";
 
-const secretKey = env.JWT_SECRET;
+const secretKey = env.AUTH_SECRET;
 const key = new TextEncoder().encode(secretKey);
 
 export async function encrypt(payload: any) {
